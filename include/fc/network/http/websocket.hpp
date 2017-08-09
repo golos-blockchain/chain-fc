@@ -6,7 +6,7 @@
 #include <fc/any.hpp>
 #include <fc/network/ip.hpp>
 #include <fc/signals.hpp>
-#include <chrono>
+#include <fc/network/http/leaky_bucket.hpp>
 
 namespace fc {
     namespace http {
@@ -20,38 +20,20 @@ namespace fc {
             class websocket_tls_client_impl;
         } // namespace detail;
 
-        using clock=std::chrono::steady_clock;
-        using millisecond = std::chrono::milliseconds;
-        using second = std::chrono::milliseconds;
 
         class websocket_connection {
         public:
-            websocket_connection(const uint64_t limit) : limit(limit), counter(0) {}
+            websocket_connection(const leaky_bucket_rules& rules):rules(rules) {}
 
-            virtual ~websocket_connection() {}
+            websocket_connection() = default;
+
+            virtual ~websocket_connection() = default;
 
             virtual void send_message(const std::string &message) = 0;
 
             virtual void close(int64_t code, const std::string &reason) {};
 
-            void on_message(const std::string &message) {
-                auto current_time = clock::now();
-
-                if (limit>=counter) {
-                    _on_message(message);
-                    ++counter;
-                }
-
-                auto delta = std::chrono::duration_cast<std::chrono::seconds>(current_time - time);
-
-                if (delta > std::chrono::seconds(0)) {
-                  time = current_time;
-                } else {
-                   counter = 0;
-                   time = current_time;
-               }
-
-            }
+            void on_message(const std::string &message);
 
             string on_http(const std::string &message) { return _on_http(message); }
 
@@ -64,13 +46,12 @@ namespace fc {
             fc::any &get_session_data() { return _session_data; }
 
             fc::signal<void()> closed;
+
+            leaky_bucket_rules rules;
         private:
             fc::any _session_data;
             std::function<void(const std::string &)> _on_message;
             std::function<string(const std::string &)> _on_http;
-            const uint64_t limit;
-            uint64_t counter;
-            clock::time_point time;
         };
 
         typedef std::shared_ptr<websocket_connection> websocket_connection_ptr;
@@ -79,7 +60,8 @@ namespace fc {
 
         class websocket_server {
         public:
-            websocket_server(const uint64_t limit);
+            websocket_server(const leaky_bucket_rules& limit);
+            websocket_server();
 
             ~websocket_server();
 
@@ -102,8 +84,13 @@ namespace fc {
         public:
             websocket_tls_server(
                     const std::string &server_pem = std::string(),
-                    const std::string &ssl_password = std::string(),
-                    const uint64_t limit = -1
+                    const std::string &ssl_password = std::string()
+            );
+
+            websocket_tls_server(
+                    const leaky_bucket_rules& rules,
+                    const std::string &server_pem = std::string(),
+                    const std::string &ssl_password = std::string()
             );
 
             ~websocket_tls_server();

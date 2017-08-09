@@ -148,7 +148,9 @@ namespace fc {
             template<typename T>
             class websocket_connection_impl : public websocket_connection {
             public:
-                websocket_connection_impl(T con,const uint64_t limit) : websocket_connection(limit),_ws_connection(con) {
+                websocket_connection_impl(T con,const leaky_bucket_rules& limit) : websocket_connection(limit),_ws_connection(con) {
+                }
+                websocket_connection_impl(T con) : websocket_connection(),_ws_connection(con) {
                 }
 
                 ~websocket_connection_impl() {
@@ -172,7 +174,7 @@ namespace fc {
 
             class websocket_server_impl {
             public:
-                websocket_server_impl(const uint64_t limit)
+                websocket_server_impl(const leaky_bucket_rules& limit)
                         : _server_thread(fc::thread::current()) {
 
                     _server.clear_access_channels(websocketpp::log::alevel::all);
@@ -283,7 +285,7 @@ namespace fc {
 
             class websocket_tls_server_impl {
             public:
-                websocket_tls_server_impl(const string &server_pem, const string &ssl_password,const uint64_t limit) : _server_thread(fc::thread::current()) {
+                websocket_tls_server_impl(const leaky_bucket_rules& limit,const string &server_pem, const string &ssl_password) : _server_thread(fc::thread::current()) {
                     //if( server_pem.size() )
                     {
                         _server.set_tls_init_handler([=](websocketpp::connection_hdl hdl) -> context_ptr {
@@ -576,7 +578,8 @@ namespace fc {
 
         } // namespace detail
 
-        websocket_server::websocket_server(const uint64_t limit) : my(new detail::websocket_server_impl(limit)) {}
+        websocket_server::websocket_server(const leaky_bucket_rules& limit) : my(new detail::websocket_server_impl(limit)) {}
+        websocket_server::websocket_server() : my(new detail::websocket_server_impl(leaky_bucket_rules())) {}
 
         websocket_server::~websocket_server() {}
 
@@ -598,8 +601,12 @@ namespace fc {
         }
 
 
-        websocket_tls_server::websocket_tls_server(const string &server_pem, const string &ssl_password,const uint64_t limit)
-                : my(new detail::websocket_tls_server_impl(server_pem, ssl_password,limit)) {}
+        websocket_tls_server::websocket_tls_server(const leaky_bucket_rules& limit,const string &server_pem, const string &ssl_password)
+                : my(new detail::websocket_tls_server_impl(limit,server_pem, ssl_password)) {}
+
+
+        websocket_tls_server::websocket_tls_server(const string &server_pem, const string &ssl_password)
+                : my(new detail::websocket_tls_server_impl(leaky_bucket_rules(),server_pem, ssl_password)) {}
 
         websocket_tls_server::~websocket_tls_server() {}
 
@@ -647,7 +654,7 @@ namespace fc {
 
                 my->_client.set_open_handler([=](websocketpp::connection_hdl hdl) {
                     auto con = my->_client.get_con_from_hdl(hdl);
-                    my->_connection = std::make_shared<detail::websocket_connection_impl<detail::websocket_client_connection_type>>(con,-1);
+                    my->_connection = std::make_shared<detail::websocket_connection_impl<detail::websocket_client_connection_type>>(con);
                     my->_closed = fc::promise<void>::ptr(new fc::promise<void>("websocket::closed"));
                     my->_connected->set_value();
                 });
@@ -675,7 +682,7 @@ namespace fc {
 
                 smy->_client.set_open_handler([=](websocketpp::connection_hdl hdl) {
                     auto con = smy->_client.get_con_from_hdl(hdl);
-                    smy->_connection = std::make_shared<detail::websocket_connection_impl<detail::websocket_tls_client_connection_type>>(con,-1);
+                    smy->_connection = std::make_shared<detail::websocket_connection_impl<detail::websocket_tls_client_connection_type>>(con);
                     smy->_closed = fc::promise<void>::ptr(new fc::promise<void>("websocket::closed"));
                     smy->_connected->set_value();
                 });
@@ -698,7 +705,7 @@ namespace fc {
 
                 my->_client.set_open_handler([=](websocketpp::connection_hdl hdl) {
                     auto con = my->_client.get_con_from_hdl(hdl);
-                    my->_connection = std::make_shared<detail::websocket_connection_impl<detail::websocket_tls_client_connection_type>>(con,-1);
+                    my->_connection = std::make_shared<detail::websocket_connection_impl<detail::websocket_tls_client_connection_type>>(con);
                     my->_closed = fc::promise<void>::ptr(new fc::promise<void>("websocket::closed"));
                     my->_connected->set_value();
                 });
@@ -713,5 +720,17 @@ namespace fc {
             } FC_CAPTURE_AND_RETHROW((uri))
         }
 
+        void websocket_connection::on_message(const std::string &message) {
+
+            rules.update_time();
+
+            if (rules.check()) {
+                _on_message(message);
+                rules.increment();
+            }
+
+            rules.update_limit();
+
+        }
     }
 } // fc::http

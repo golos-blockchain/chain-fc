@@ -81,76 +81,87 @@ void websocket_api_connection::send_notice(
    _connection.send_message( fc::json::to_string(req) );
 }
 
-std::string websocket_api_connection::on_message(
-   const std::string& message,
-   bool send_message /* = true */ )
-{
-   wdump((message));
-   try
-   {
-      auto var = fc::json::from_string(message);
-      const auto& var_obj = var.get_object();
-      if( var_obj.contains( "method" ) )
-      {
-         auto call = var.as<fc::rpc::request>();
-         exception_ptr optexcept;
-         try
-         {
+        std::string websocket_api_connection::on_message(const std::string& message, bool send_message /* = true */ ) {
+            std::string tmp("");
+            _connection.rules.update_time();
+
+            if (_connection.rules.check()) {
+                tmp = on_message_impl(message,send_message);
+                _connection.rules.increment();
+            }
+
+            _connection.rules.update_limit();
+
+
+            return tmp;
+        }
+        std::string websocket_api_connection::on_message_impl(const std::string &message, bool send_message) {
+            wdump((message));
             try
             {
+                auto var = fc::json::from_string(message);
+                const auto& var_obj = var.get_object();
+                if( var_obj.contains( "method" ) )
+                {
+                    auto call = var.as<fc::rpc::request>();
+                    exception_ptr optexcept;
+                    try
+                    {
+                        try
+                        {
 #ifdef LOG_LONG_API
-               auto start = time_point::now();
+                            auto start = time_point::now();
 #endif
 
-               auto result = _rpc_state.local_call( call.method, call.params );
+                            auto result = _rpc_state.local_call( call.method, call.params );
 
 #ifdef LOG_LONG_API
-               auto end = time_point::now();
+                            auto end = time_point::now();
 
-               if( end - start > fc::milliseconds( LOG_LONG_API_MAX_MS ) )
-                  elog( "API call execution time limit exceeded. method: ${m} params: ${p} time: ${t}", ("m",call.method)("p",call.params)("t", end - start) );
-               else if( end - start > fc::milliseconds( LOG_LONG_API_WARN_MS ) )
-                  wlog( "API call execution time nearing limit. method: ${m} params: ${p} time: ${t}", ("m",call.method)("p",call.params)("t", end - start) );
+                            if( end - start > fc::milliseconds( LOG_LONG_API_MAX_MS ) )
+                                elog( "API call execution time limit exceeded. method: ${m} params: ${p} time: ${t}", ("m",call.method)("p",call.params)("t", end - start) );
+                            else if( end - start > fc::milliseconds( LOG_LONG_API_WARN_MS ) )
+                                wlog( "API call execution time nearing limit. method: ${m} params: ${p} time: ${t}", ("m",call.method)("p",call.params)("t", end - start) );
 #endif
 
-               if( call.id )
-               {
-                  auto reply = fc::json::to_string( response( *call.id, result ) );
-                  if( send_message )
-                     _connection.send_message( reply );
-                  return reply;
-               }
+                            if( call.id )
+                            {
+                                auto reply = fc::json::to_string( response( *call.id, result ) );
+                                if( send_message )
+                                    _connection.send_message( reply );
+                                return reply;
+                            }
+                        }
+                        FC_CAPTURE_AND_RETHROW( (call.method)(call.params) )
+                    }
+                    catch ( const fc::exception& e )
+                    {
+                        if( call.id )
+                        {
+                            optexcept = e.dynamic_copy_exception();
+                        }
+                    }
+                    if( optexcept ) {
+
+                        auto reply = fc::json::to_string( response( *call.id,  error_object{ 1, optexcept->to_detail_string(), fc::variant(*optexcept)}  ) );
+                        if( send_message )
+                            _connection.send_message( reply );
+
+                        return reply;
+                    }
+                }
+                else
+                {
+                    auto reply = var.as<fc::rpc::response>();
+                    _rpc_state.handle_reply( reply );
+                }
             }
-            FC_CAPTURE_AND_RETHROW( (call.method)(call.params) )
-         }
-         catch ( const fc::exception& e )
-         {
-            if( call.id )
+            catch ( const fc::exception& e )
             {
-               optexcept = e.dynamic_copy_exception();
+                wdump((e.to_detail_string()));
+                return e.to_detail_string();
             }
-         }
-         if( optexcept ) {
-
-               auto reply = fc::json::to_string( response( *call.id,  error_object{ 1, optexcept->to_detail_string(), fc::variant(*optexcept)}  ) );
-               if( send_message )
-                  _connection.send_message( reply );
-
-               return reply;
-         }
-      }
-      else
-      {
-         auto reply = var.as<fc::rpc::response>();
-         _rpc_state.handle_reply( reply );
-      }
-   }
-   catch ( const fc::exception& e )
-   {
-      wdump((e.to_detail_string()));
-      return e.to_detail_string();
-   }
-   return string();
-}
+            return string();
+        }
 
 } } // namespace fc::rpc
