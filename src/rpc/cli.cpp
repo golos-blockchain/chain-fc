@@ -86,6 +86,16 @@ void cli::set_prompt( const string& prompt )
    _prompt = prompt;
 }
 
+// formatters_iterator cli::get_result_formatters_end() {
+std::map<string,std::function<string(variant,const variants&)> >::iterator cli::get_result_formatters_end() {
+   return _result_formatters.end();
+}
+
+// formatters_iterator cli::find_method( const std::string& method ) {
+std::map<string,std::function<string(variant,const variants&)> >::iterator cli::find_method( const std::string& method ) {
+   return _result_formatters.find( method );
+}
+
 void cli::run()
 {
    while( !_run_complete.canceled() )
