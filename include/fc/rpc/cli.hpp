@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-// typedef std::map<string,std::function<string(variant,const variants&)> >::iterator formatters_iterator;
+using formatters_iterator = std::map<std::string,std::function<std::string(fc::variant,const fc::variants&)> >::iterator;
 
 namespace fc { namespace rpc {
 
@@ -32,10 +32,9 @@ namespace fc { namespace rpc {
          virtual void getline( const fc::string& prompt, fc::string& line );
 
          void set_prompt( const string& prompt );
-         // formatters_iterator get_result_formatters_end();
-         // formatters_iterator find_method( const std::string& method );
-         std::map<string,std::function<string(variant,const variants&)> >::iterator get_result_formatters_end();
-         std::map<string,std::function<string(variant,const variants&)> >::iterator find_method( const std::string& method );
+         
+         formatters_iterator get_result_formatters_end();
+         formatters_iterator find_method( const std::string& method );
 
       private:
          void run();
