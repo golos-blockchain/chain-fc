@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-using formatters_iterator = std::map<std::string,std::function<std::string(fc::variant,const fc::variants&)> >::iterator;
+using result_formatter = std::map<std::string,std::function<std::string(fc::variant,const fc::variants&)> >;
 
 namespace fc { namespace rpc {
 
@@ -33,13 +33,13 @@ namespace fc { namespace rpc {
 
          void set_prompt( const string& prompt );
          
-         formatters_iterator get_result_formatters_end();
-         formatters_iterator find_method( const std::string& method );
+         result_formatter::iterator get_result_formatters_end();
+         result_formatter::iterator find_method( const std::string& method );
 
       private:
          void run();
          std::string _prompt = ">>>";
-         std::map<string,std::function<string(variant,const variants&)> > _result_formatters;
+         result_formatter _result_formatters;
          fc::future<void> _run_complete;
 
    };

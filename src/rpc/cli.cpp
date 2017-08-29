@@ -86,11 +86,11 @@ void cli::set_prompt( const string& prompt )
    _prompt = prompt;
 }
 
-formatters_iterator cli::get_result_formatters_end() {
+result_formatter::iterator cli::get_result_formatters_end() {
    return _result_formatters.end();
 }
 
-formatters_iterator cli::find_method( const std::string& method ) {
+result_formatter::iterator cli::find_method( const std::string& method ) {
    return _result_formatters.find( method );
 }
 
