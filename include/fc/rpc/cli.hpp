@@ -8,9 +8,10 @@
 
 #include <iostream>
 
-using result_formatter = std::map<std::string,std::function<std::string(fc::variant,const fc::variants&)> >;
 
 namespace fc { namespace rpc {
+   
+using result_formatter = std::map<std::string,std::function<std::string(fc::variant,const fc::variants&)> >;
 
    /**
     *  Provides a simple wrapper for RPC calls to a given interface.
