@@ -11,7 +11,7 @@
 
 namespace fc { namespace rpc {
    
-using result_formatter = std::map<std::string,std::function<std::string(fc::variant,const fc::variants&)> >;
+using result_formatter = std::map<std::string, std::function<std::string(fc::variant, const fc::variants&)> >;
 
    /**
     *  Provides a simple wrapper for RPC calls to a given interface.
@@ -34,8 +34,10 @@ using result_formatter = std::map<std::string,std::function<std::string(fc::vari
 
          void set_prompt( const string& prompt );
          
-         result_formatter::iterator get_result_formatters_end();
-         result_formatter::iterator find_method( const std::string& method );
+         virtual void exec_command (
+            const std::string & command,
+            std::vector < std::pair < std::string, std::string > > & commands_output
+         );
 
       private:
          void run();

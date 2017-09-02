@@ -86,12 +86,34 @@ void cli::set_prompt( const string& prompt )
    _prompt = prompt;
 }
 
-result_formatter::iterator cli::get_result_formatters_end() {
-   return _result_formatters.end();
-}
+void cli::exec_command (
+   const std::string & command,
+   std::vector < std::pair < std::string, std::string > > & commands_output
+) {
 
-result_formatter::iterator cli::find_method( const std::string& method ) {
-   return _result_formatters.find( method );
+   std::string line = command;
+
+   line += char(EOF);
+   fc::variants args = fc::json::variants_from_string(line);
+
+   if ( args.size() == 0 ) {
+      return;
+   }
+
+   const string& method = args[0].get_string();
+
+   auto result = receive_call( 0, method, fc::variants( args.begin() + 1, args.end() ) );
+
+   auto itr = _result_formatters.find( method );
+
+   if ( itr == _result_formatters.end() ) {
+      commands_output.push_back ( std::make_pair ( method, fc::json::to_pretty_string ( result ) ) );
+   }
+   else {
+      std::string output = (itr->second( result, args ));
+
+      commands_output.push_back ( std::make_pair ( result.get_string(), fc::json::to_pretty_string ( output ) ) );
+   }
 }
 
 void cli::run()
