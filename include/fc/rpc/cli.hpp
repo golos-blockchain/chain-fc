@@ -21,29 +21,25 @@ using result_formatter = std::map<std::string, std::function<std::string(fc::var
       public:
          ~cli();
 
-         virtual variant send_call( api_id_type api_id, string method_name, variants args = variants() );
-         virtual variant send_callback( uint64_t callback_id, variants args = variants() );
-         virtual void    send_notice( uint64_t callback_id, variants args = variants() );
+         virtual variant send_call ( api_id_type api_id, string method_name, variants args = variants() );
+         virtual variant send_callback ( uint64_t callback_id, variants args = variants() );
+         virtual void    send_notice ( uint64_t callback_id, variants args = variants() );
 
          void start();
          void stop();
          void wait();
-         void format_result( const string& method, std::function<string(variant,const variants&)> formatter);
+         void format_result ( const string& method, std::function<string(variant,const variants&)> formatter);
 
-         virtual void getline( const fc::string& prompt, fc::string& line );
+         virtual void getline ( const fc::string& prompt, fc::string& line );
 
-         void set_prompt( const string& prompt );
+         void set_prompt ( const string& prompt );
          
-         virtual void exec_command (
-            const std::string & command,
-            std::vector < std::pair < std::string, std::string > > & commands_output
-         );
+         virtual std::string exec_command ( const std::string & command );
 
       private:
          void run();
-         std::string _prompt = ">>>";
-         result_formatter _result_formatters;
-         fc::future<void> _run_complete;
-
+         std::string prompt_ = ">>>";
+         result_formatter result_formatters_;
+         fc::future<void> run_complete_;
    };
 } } 
