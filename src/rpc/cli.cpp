@@ -99,16 +99,16 @@ std::string cli::exec_command ( const std::string & command) {
 
       const string& method = args[0].get_string();
 
-      auto result = receive_call ( 0, method, fc::variants( args.begin() + 1, args.end() ) ) ;
+      auto result = receive_call ( 0, method, fc::variants ( args.begin() + 1, args.end() ) ) ;
 
       auto itr = result_formatters_.find ( method ) ;
 
       if ( itr == result_formatters_.end() ) {
-         return method + " " + fc::json::to_pretty_string ( result );
+         return fc::json::to_pretty_string ( result );
       }
       else {
          std::string output = ( itr -> second ( result, args ) ) ;
-         return result.get_string() + " " + fc::json::to_pretty_string ( output ) ;
+         return fc::json::to_pretty_string ( output ) ;
       }
    }
    catch ( const fc::exception& e ) {
