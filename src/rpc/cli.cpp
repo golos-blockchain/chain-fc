@@ -38,7 +38,7 @@ static std::vector<std::string>& cli_commands()
 
 cli::~cli()
 {
-   if( _run_complete.valid() )
+   if( run_complete_.valid() )
    {
       stop();
    }
@@ -62,64 +62,92 @@ void cli::send_notice( uint64_t callback_id, variants args /* = variants() */ )
 void cli::start()
 {
    cli_commands() = get_method_names(0);
-   _run_complete = fc::async( [&](){ run(); } );
+   run_complete_ = fc::async( [&](){ run(); } );
 }
 
 void cli::stop()
 {
-   _run_complete.cancel();
-   _run_complete.wait();
+   run_complete_.cancel();
+   run_complete_.wait();
 }
 
 void cli::wait()
 {
-   _run_complete.wait();
+   run_complete_.wait();   
 }
 
 void cli::format_result( const string& method, std::function<string(variant,const variants&)> formatter)
 {
-   _result_formatters[method] = formatter;
+   result_formatters_[method] = formatter;
 }
 
 void cli::set_prompt( const string& prompt )
 {
-   _prompt = prompt;
+   prompt_ = prompt;
+}
+
+std::string cli::exec_command ( const std::string & command) {
+   try {
+      std::string line = command;
+
+      line += char(EOF);
+      fc::variants args = fc::json::variants_from_string(line);
+
+      if ( args.size() == 0 ) {
+         return NULL;
+      }
+
+      const string& method = args[0].get_string();
+
+      auto result = receive_call ( 0, method, fc::variants ( args.begin() + 1, args.end() ) ) ;
+
+      auto itr = result_formatters_.find ( method ) ;
+
+      if ( itr == result_formatters_.end() ) {
+         return fc::json::to_pretty_string ( result );
+      }
+      else {
+         std::string output = ( itr -> second ( result, args ) ) ;
+         return fc::json::to_pretty_string ( output ) ;
+      }
+   }
+   catch ( const fc::exception& e ) {
+      std::cout << e.to_detail_string() << '\n';
+   }
 }
 
 void cli::run()
 {
-   while( !_run_complete.canceled() )
+   while( !run_complete_.canceled() )
    {
-      try
-      {
+      try {
          std::string line;
-         try
-         {
-            getline( _prompt.c_str(), line );
+         try {
+            getline( prompt_.c_str(), line );
          }
-         catch ( const fc::eof_exception& e )
-         {
+         catch ( const fc::eof_exception& e ) {
             break;
          }
          std::cout << line << "\n";
          line += char(EOF);
          fc::variants args = fc::json::variants_from_string(line);;
-         if( args.size() == 0 )
+         if( args.size() == 0 ) {
             continue;
+         }
 
          const string& method = args[0].get_string();
 
          auto result = receive_call( 0, method, variants( args.begin()+1,args.end() ) );
-         auto itr = _result_formatters.find( method );
-         if( itr == _result_formatters.end() )
-         {
+         auto itr = result_formatters_.find( method );
+         
+         if ( itr == result_formatters_.end() ) {
             std::cout << fc::json::to_pretty_string( result ) << "\n";
          }
-         else
+         else {
             std::cout << itr->second( result, args ) << "\n";
+         }
       }
-      catch ( const fc::exception& e )
-      {
+      catch ( const fc::exception& e ) {
          std::cout << e.to_detail_string() << "\n";
       }
    }
