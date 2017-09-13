@@ -103,13 +103,15 @@ std::string cli::exec_command ( const std::string & command) {
 
       auto itr = result_formatters_.find ( method ) ;
 
+      std::string output ;
       if ( itr == result_formatters_.end() ) {
-         return fc::json::to_pretty_string ( result );
+         output = fc::json::to_pretty_string ( result ) ;
       }
       else {
-         std::string output = ( itr -> second ( result, args ) ) ;
-         return fc::json::to_pretty_string ( output ) ;
+         output = ( itr -> second ( result, args ) ) ;
+         output = fc::json::to_pretty_string ( output ) ;
       }
+      return output ;
    }
    catch ( const fc::exception& e ) {
       std::cout << e.to_detail_string() << '\n';
