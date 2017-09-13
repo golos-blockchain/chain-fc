@@ -87,6 +87,7 @@ void cli::set_prompt( const string& prompt )
 }
 
 std::string cli::exec_command ( const std::string & command) {
+   std::string output ;
    try {
       std::string line = command;
 
@@ -103,7 +104,7 @@ std::string cli::exec_command ( const std::string & command) {
 
       auto itr = result_formatters_.find ( method ) ;
 
-      std::string output ;
+      
       if ( itr == result_formatters_.end() ) {
          output = fc::json::to_pretty_string ( result ) ;
       }
@@ -111,11 +112,11 @@ std::string cli::exec_command ( const std::string & command) {
          output = ( itr -> second ( result, args ) ) ;
          output = fc::json::to_pretty_string ( output ) ;
       }
-      return output ;
    }
    catch ( const fc::exception& e ) {
       std::cout << e.to_detail_string() << '\n';
    }
+   return output ;
 }
 
 void cli::run()
