@@ -366,7 +366,7 @@ namespace fc {
 
     };
 
-    class aes_exception : public basic_exception<aes_exception_code, "AES error"> {
+    class aes_exception : public basic_exception<aes_error_code, "AES error"> {
 
     };
 
