@@ -309,7 +309,7 @@ namespace fc {
 
     typedef basic_exception<bad_cast_exception_code, boost::mpl::string<'Bad Cast'>> bad_cast_exception;
 
-    typedef basic_exception<out_of_range_exception_code, boost::mpl::string<'Out of Range'>> out_of_range_execption;
+    typedef basic_exception<out_of_range_exception_code, boost::mpl::string<'Out of Range'>> out_of_range_exception;
 
     /** @brief if an operation is unsupported or not valid this may be thrown */
 
