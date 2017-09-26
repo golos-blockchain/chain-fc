@@ -367,13 +367,13 @@ namespace fc {
 /**
  *  @brief Checks a condition and throws an assert_exception if the test is FALSE
  */
-#define FC_ASSERT(TEST, ...) \
+#define FC_ASSERT( TEST, ... ) \
   FC_EXPAND_MACRO( \
     FC_MULTILINE_MACRO_BEGIN \
       if( UNLIKELY(!(TEST)) ) \
       {                                                                      \
-        if( fc::enable_record_assert_trip ){                                  \
-                   fc::record_assert_trip( __FILE__, __LINE__,} #TEST );              \
+        if( fc::enable_record_assert_trip )                                  \
+           fc::record_assert_trip( __FILE__, __LINE__, #TEST );              \
         FC_THROW_EXCEPTION( fc::assert_exception, #TEST ": "  __VA_ARGS__ ); \
       }                                                                      \
     FC_MULTILINE_MACRO_END \
