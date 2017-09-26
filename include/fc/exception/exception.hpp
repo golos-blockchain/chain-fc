@@ -3,8 +3,11 @@
  *  @file exception.hpp
  *  @brief Defines exception's used by fc
  */
+#include <boost/mpl/string.hpp>
+
 #include <fc/log/logger.hpp>
 #include <fc/optional.hpp>
+
 #include <exception>
 #include <functional>
 #include <unordered_map>
@@ -226,12 +229,11 @@ namespace fc {
       return true; \
    }();
 
-
-    template<uint32_t Code, std::string What, typename BaseException = fc::exception>
+    template<uint32_t Code, typename What, typename BaseException = fc::exception>
     class basic_exception : public BaseException {
     public:
         enum code_enum {
-            code_value = Code,
+            code_value = Code
         };
 
         explicit basic_exception(int64_t code, const std::string &name_value, const std::string &what_value)
@@ -252,15 +254,13 @@ namespace fc {
                                  const std::string &what_value) : BaseException(m, code, name_value, what_value) {
         }
 
-        basic_exception(const std::string &what_value, const fc::log_messages &m) : BaseException(m, Code,
-                                                                                                  basic_exception,
-                                                                                                  what_value) {
+        basic_exception(const std::string &what_value, const fc::log_messages &m) : BaseException(m, Code, "basic_exception", what_value) {
         }
 
-        basic_exception(fc::log_message &&m) : BaseException(fc::move(m), Code, basic_exception, What) {
+        basic_exception(fc::log_message &&m) : BaseException(fc::move(m), Code, "basic_exception", boost::mpl::c_str<What>::value) {
         }
 
-        basic_exception(fc::log_messages msgs) : BaseException(fc::move(msgs), Code, basic_exception, What) {
+        basic_exception(fc::log_messages msgs) : BaseException(fc::move(msgs), Code, "basic_exception", boost::mpl::c_str<What>::value) {
         }
 
         basic_exception(const basic_exception &c) : BaseException(c) {
@@ -269,7 +269,7 @@ namespace fc {
         basic_exception(const BaseException &c) : BaseException(c) {
         }
 
-        basic_exception() : BaseException(Code, basic_exception, What) {
+        basic_exception() : BaseException(Code, "basic_exception", boost::mpl::c_str<What>::value) {
         }
 
         virtual ~basic_exception() {
@@ -277,11 +277,11 @@ namespace fc {
         }
 
         virtual std::shared_ptr<fc::exception> dynamic_copy_exception() const {
-            return std::make_shared<basic_exception>(*this);
+            return std::make_shared<basic_exception<Code, What>>(*this);
         }
 
         virtual NO_RETURN void dynamic_rethrow_exception() const {
-            if (code() == Code) {
+            if (this->code() == Code) {
                 throw *this;
             } else {
                 fc::exception::dynamic_rethrow_exception();
@@ -289,98 +289,61 @@ namespace fc {
         }
     };
 
+    typedef basic_exception<timeout_exception_code, boost::mpl::string<'Timeout'>> timeout_exception;
 
-    class timeout_exception : public basic_exception<timeout_exception_code, "Timeout"> {
-
-    };
-
-    class file_not_found_exception : public basic_exception<file_not_found_exception_code, "File Not Found"> {
-
-    };
+    typedef basic_exception<file_not_found_exception_code, boost::mpl::string<'File Not Found'>> file_not_found_exception;
 
     /**
      * @brief report's parse errors
      */
 
-    class parse_error_exception : public basic_exception<parse_error_exception_code, "Parse Error"> {
+    typedef basic_exception<parse_error_exception_code, boost::mpl::string<'Parse Error'>> parse_error_exception;
 
-    };
-
-    class invalid_arg_exception : public basic_exception<invalid_arg_exception_code, "Invalid Argument"> {
-
-    };
+    typedef basic_exception<invalid_arg_exception_code, boost::mpl::string<'Invalid Argument'>> invalid_arg_exception;
 
     /**
      * @brief reports when a key, guid, or other item is not found.
      */
 
-    class key_not_found_exception : public basic_exception<key_not_found_exception_code, "Key Not Found"> {
+    typedef basic_exception<key_not_found_exception_code, boost::mpl::string<'Key Not Found'>> key_not_found_exception;
 
-    };
+    typedef basic_exception<bad_cast_exception_code, boost::mpl::string<'Bad Cast'>> bad_cast_exception;
 
-    class bad_cast_exception : public basic_exception<bad_cast_exception_code, "Bad Cast"> {
-
-    };
-
-    class out_of_range_exception : public basic_exception<out_of_range_exception_code, "Out of Range"> {
-
-    };
+    typedef basic_exception<out_of_range_exception_code, boost::mpl::string<'Out of Range'>> out_of_range_execption;
 
     /** @brief if an operation is unsupported or not valid this may be thrown */
 
-    class invalid_operation_exception : public basic_exception<invalid_operation_exception_code, "Invalid Operation"> {
-
-    };
+    typedef basic_exception<invalid_operation_exception_code, boost::mpl::string<'Invalid Operation'>> invalid_operation_exception;
 
     /** @brief if an host name can not be resolved this may be thrown */
 
-    class unknown_host_exception : public basic_exception<unknown_host_exception_code, "Unknown Host"> {
-
-    };
+    typedef basic_exception<unknown_host_exception_code, boost::mpl::string<'Unknown Host'>> unknown_host_exception;
 
     /**
      *  @brief used to report a canceled Operation
      */
 
-    class canceled_exception : public basic_exception<canceled_exception_code, "Canceled"> {
-
-    };
+    typedef basic_exception<canceled_exception_code, boost::mpl::string<'Canceled'>> canceled_exception;
 
     /**
      *  @brief used inplace of assert() to report violations of pre conditions.
      */
 
-    class assert_exception : public basic_exception<assert_exception_code, "Assert Exception"> {
+    typedef basic_exception<assert_exception_code, boost::mpl::string<'Assert Exception'>> assert_exception;
 
-    };
+    typedef basic_exception<eof_exception_code, boost::mpl::string<'End Of File'>> eof_exception;
 
-    class eof_exception : public basic_exception<eof_exception_code, "End Of File"> {
+    typedef basic_exception<null_optional_code, boost::mpl::string<'null optional'>> null_optional;
 
-    };
+    typedef basic_exception<udt_error_code, boost::mpl::string<'UDT error'>> udt_exception;
 
-    class null_optional : public basic_exception<null_optional_code, "null optional"> {
+    typedef basic_exception<aes_error_code, boost::mpl::string<'AES error'>> aes_exception;
 
-    };
+    typedef basic_exception<overflow_code, boost::mpl::string<'Integer Overflow'>> overflow_exception;
 
-    class udt_exception : public basic_exception<udt_error_code, "UDT error"> {
+    typedef basic_exception<underflow_code, boost::mpl::string<'Integer Underflow'>> underflow_exception;
 
-    };
-
-    class aes_exception : public basic_exception<aes_error_code, "AES error"> {
-
-    };
-
-    class overflow_exception : public basic_exception<overflow_code, "Integer Overflow"> {
-
-    };
-
-    class underflow_exception : public basic_exception<underflow_code, "Integer Underflow"> {
-
-    };
-
-    class divide_by_zero_exception : public basic_exception<divide_by_zero_code, "Integer Divide By Zero"> {
-
-    };
+    typedef basic_exception<divide_by_zero_code, boost::mpl::string<'Integer Divide By Zero'>> divide_by_zero_exception;
 
     std::string except_str();
 
