@@ -254,13 +254,17 @@ namespace fc {
                                  const std::string &what_value) : BaseException(m, code, name_value, what_value) {
         }
 
-        basic_exception(const std::string &what_value, const fc::log_messages &m) : BaseException(m, Code, "basic_exception", what_value) {
+        basic_exception(const std::string &what_value, const fc::log_messages &m) : BaseException(m, Code,
+                                                                                                  "basic_exception",
+                                                                                                  what_value) {
         }
 
-        basic_exception(fc::log_message &&m) : BaseException(fc::move(m), Code, "basic_exception", boost::mpl::c_str<What>::value) {
+        basic_exception(fc::log_message &&m) : BaseException(fc::move(m), Code, "basic_exception",
+                                                             boost::mpl::c_str<What>::value) {
         }
 
-        basic_exception(fc::log_messages msgs) : BaseException(fc::move(msgs), Code, "basic_exception", boost::mpl::c_str<What>::value) {
+        basic_exception(fc::log_messages msgs) : BaseException(fc::move(msgs), Code, "basic_exception",
+                                                               boost::mpl::c_str<What>::value) {
         }
 
         basic_exception(const basic_exception &c) : BaseException(c) {
@@ -289,9 +293,13 @@ namespace fc {
         }
     };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
+
     typedef basic_exception<timeout_exception_code, boost::mpl::string<'Timeout'>> timeout_exception;
 
-    typedef basic_exception<file_not_found_exception_code, boost::mpl::string<'File Not Found'>> file_not_found_exception;
+    typedef basic_exception<file_not_found_exception_code,
+            boost::mpl::string<'File Not Found'>> file_not_found_exception;
 
     /**
      * @brief report's parse errors
@@ -313,7 +321,8 @@ namespace fc {
 
     /** @brief if an operation is unsupported or not valid this may be thrown */
 
-    typedef basic_exception<invalid_operation_exception_code, boost::mpl::string<'Invalid Operation'>> invalid_operation_exception;
+    typedef basic_exception<invalid_operation_exception_code,
+            boost::mpl::string<'Invalid Operation'>> invalid_operation_exception;
 
     /** @brief if an host name can not be resolved this may be thrown */
 
@@ -344,6 +353,8 @@ namespace fc {
     typedef basic_exception<underflow_code, boost::mpl::string<'Integer Underflow'>> underflow_exception;
 
     typedef basic_exception<divide_by_zero_code, boost::mpl::string<'Integer Divide By Zero'>> divide_by_zero_exception;
+
+#pragma GCC diagnostic pop
 
     std::string except_str();
 
