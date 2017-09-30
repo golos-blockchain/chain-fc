@@ -69,11 +69,14 @@ namespace fc {
     void throw_bad_enum_cast(const char *k, const char *e);
 } // namespace fc
 
+#define _Args(...) __VA_ARGS__
+#define STRIP_PARENS(X) X
+#define FC_REMOVE_PARENTHNESS(X) STRIP_PARENS( _Args X )
 
 #ifndef DOXYGEN
 
 #define FC_REFLECT_VISIT_BASE(r, visitor, base) \
-  fc::reflector<base>::visit( visitor );
+  fc::reflector<FC_REMOVE_PARENTHNESS(base)>::visit( visitor );
 
 
 #ifndef _MSC_VER
@@ -91,7 +94,7 @@ namespace fc {
 
 
 #define FC_REFLECT_BASE_MEMBER_COUNT(r, OP, elem) \
-  OP fc::reflector<elem>::total_member_count
+  OP fc::reflector<FC_REMOVE_PARENTHNESS(elem)>::total_member_count
 
 #define FC_REFLECT_MEMBER_COUNT(r, OP, elem) \
   OP 1
@@ -111,7 +114,6 @@ void fc::reflector<TYPE>::visit( const Visitor& v ) { \
 }
 
 #endif // DOXYGEN
-
 
 #define FC_REFLECT_VISIT_ENUM(r, enum_type, elem) \
   v.operator()(BOOST_PP_STRINGIZE(elem), int64_t(enum_type::elem) );
@@ -191,10 +193,6 @@ template<> struct get_typename<ENUM>  { static const char* name()  { return BOOS
  *      BOOST_PP_SEQ_FOR_EACH( FC_REFLECT_VISIT_ENUM, ENUM, FIELDS ) \
  *  }\
  */
-
-#define _Args(...) __VA_ARGS__
-#define STRIP_PARENS(X) X
-#define FC_REMOVE_PARENTHNESS(X) STRIP_PARENS( _Args X )
 
 /**
  *  @def FC_REFLECT_DERIVED(TYPE,INHERITS,MEMBERS)
