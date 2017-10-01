@@ -89,7 +89,7 @@ namespace fc {
 
 #define FC_REFLECT_VISIT_MEMBER(r, visitor, elem) \
 { typedef decltype(((type*)nullptr)->elem) member_type;  \
-  visitor.TEMPLATE operator()<member_type,type,&type::elem>( BOOST_PP_STRINGIZE(elem) ); \
+  visitor.TEMPLATE operator()<member_type,type,&type::elem>( FC_STRINGIZE(elem) ); \
 }
 
 
@@ -116,14 +116,14 @@ void fc::reflector<TYPE>::visit( const Visitor& v ) { \
 #endif // DOXYGEN
 
 #define FC_REFLECT_VISIT_ENUM(r, enum_type, elem) \
-  v.operator()(BOOST_PP_STRINGIZE(elem), int64_t(enum_type::elem) );
+  v.operator()(FC_STRINGIZE(elem), int64_t(enum_type::elem) );
 #define FC_REFLECT_ENUM_TO_STRING(r, enum_type, elem) \
-   case enum_type::elem: return BOOST_PP_STRINGIZE(elem);
+   case enum_type::elem: return FC_STRINGIZE(elem);
 #define FC_REFLECT_ENUM_TO_FC_STRING(r, enum_type, elem) \
-   case enum_type::elem: return fc::string(BOOST_PP_STRINGIZE(elem));
+   case enum_type::elem: return fc::string(FC_STRINGIZE(elem));
 
 #define FC_REFLECT_ENUM_FROM_STRING(r, enum_type, elem) \
-  if( strcmp( s, BOOST_PP_STRINGIZE(elem)  ) == 0 ) return enum_type::elem;
+  if( strcmp( s, FC_STRINGIZE(elem)  ) == 0 ) return enum_type::elem;
 #define FC_REFLECT_ENUM_FROM_STRING_CASE(r, enum_type, elem) \
    case enum_type::elem:
 
@@ -136,7 +136,7 @@ template<> struct reflector<ENUM> { \
       switch( elem ) { \
         BOOST_PP_SEQ_FOR_EACH( FC_REFLECT_ENUM_TO_STRING, ENUM, FIELDS ) \
         default: \
-           fc::throw_bad_enum_cast( fc::to_string(int64_t(elem)).c_str(), BOOST_PP_STRINGIZE(ENUM) ); \
+           fc::throw_bad_enum_cast( fc::to_string(int64_t(elem)).c_str(), FC_STRINGIZE(ENUM) ); \
       }\
       return nullptr; \
     } \
@@ -159,7 +159,7 @@ template<> struct reflector<ENUM> { \
         BOOST_PP_SEQ_FOR_EACH( FC_REFLECT_ENUM_FROM_STRING_CASE, ENUM, FIELDS ) \
           break; \
         default: \
-          fc::throw_bad_enum_cast( i, BOOST_PP_STRINGIZE(ENUM) ); \
+          fc::throw_bad_enum_cast( i, FC_STRINGIZE(ENUM) ); \
       } \
       return e;\
     } \
@@ -172,7 +172,7 @@ template<> struct reflector<ENUM> { \
         } \
         catch( const boost::bad_lexical_cast& e ) \
         { \
-           fc::throw_bad_enum_cast( s, BOOST_PP_STRINGIZE(ENUM) ); \
+           fc::throw_bad_enum_cast( s, FC_STRINGIZE(ENUM) ); \
         } \
         return from_int(i); \
     } \
@@ -182,7 +182,7 @@ template<> struct reflector<ENUM> { \
         BOOST_PP_SEQ_FOR_EACH( FC_REFLECT_VISIT_ENUM, ENUM, FIELDS ) \
     } \
 };  \
-template<> struct get_typename<ENUM>  { static const char* name()  { return BOOST_PP_STRINGIZE(ENUM);  } }; \
+template<> struct get_typename<ENUM>  { static const char* name()  { return FC_STRINGIZE(ENUM);  } }; \
 }
 
 /*  Note: FC_REFLECT_ENUM previously defined this function, but I don't think it ever
@@ -252,12 +252,12 @@ template<BOOST_PP_SEQ_ENUM(TEMPLATE_ARGS)> struct reflector<FC_REMOVE_PARENTHNES
 
 #define FC_REFLECT_TYPENAME(TYPE) \
 namespace fc { \
-  template<> struct get_typename<FC_REMOVE_PARENTHNESS(TYPE)>  { static const char* name()  { return BOOST_PP_STRINGIZE(FC_REMOVE_PARENTHNESS(TYPE));  } }; \
+  template<> struct get_typename<FC_REMOVE_PARENTHNESS(TYPE)>  { static const char* name()  { return FC_STRINGIZE(FC_REMOVE_PARENTHNESS(TYPE));  } }; \
 }
 
 #define FC_REFLECT_FWD(TYPE) \
 namespace fc { \
-  template<> struct get_typename<TYPE>  { static const char* name()  { return BOOST_PP_STRINGIZE(TYPE);  } }; \
+  template<> struct get_typename<TYPE>  { static const char* name()  { return FC_STRINGIZE(TYPE);  } }; \
 template<> struct reflector<TYPE> {\
     typedef TYPE type; \
     typedef fc::true_type is_defined; \
