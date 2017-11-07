@@ -16,20 +16,26 @@ namespace fc {
    template<typename Storage = std::pair<uint64_t,uint64_t> >
    class fixed_string {
       public:
-         fixed_string(){}
+         fixed_string(){
+            memset( (char*)&data, 0, sizeof(data) );
+         }
          fixed_string( const fixed_string& c ):data(c.data){}
 
          fixed_string( const std::string& str ) {
-            if( str.size() <= sizeof(data) )
+            if( str.size() < sizeof(data) ) {
+               memset( (char*)&data, 0, sizeof(data) );
                memcpy( (char*)&data, str.c_str(), str.size() );
-            else {
+            } else {
                memcpy( (char*)&data, str.c_str(), sizeof(data) );
             }
          }
          fixed_string( const char* str ) {
+            memset( (char*)&data, 0, sizeof(data) );
             auto l = strlen(str);
-            if( l <= sizeof(data) )
+            if( l < sizeof(data) ) {
+               memset( (char*)&data, 0, sizeof(data) );
                memcpy( (char*)&data, str, l );
+            }
             else {
                memcpy( (char*)&data, str, sizeof(data) );
             }
@@ -56,8 +62,8 @@ namespace fc {
          }
 
          fixed_string& operator=( const std::string& str ) {
-            if( str.size() <= sizeof(data) ) {
-               data = Storage();
+            if( str.size() < sizeof(data) ) {
+               memset( (char*)&data, 0, sizeof(data) );
                memcpy( (char*)&data, str.c_str(), str.size() );
             }
             else {
@@ -90,6 +96,10 @@ namespace fc {
          }
          friend bool operator != ( const fixed_string& a, const fixed_string& b ) {
             return a.data != b.data;
+         }
+
+         friend std::ostream& operator << ( std::ostream& out, const fixed_string& str ) {
+            return out << std::string(str);
          }
       //private:
          Storage data;
