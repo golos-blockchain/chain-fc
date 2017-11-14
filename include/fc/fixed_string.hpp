@@ -20,11 +20,12 @@ namespace fc {
         }
 
         fixed_string(const fixed_string &c) : data(c.data) {
+
         }
 
         fixed_string(const std::string &str) {
+            memset((char *) &data, 0, sizeof(data));
             if (str.size() < sizeof(data)) {
-                memset((char *) &data, 0, sizeof(data));
                 memcpy((char *) &data, str.c_str(), str.size());
             } else {
                 memcpy((char *) &data, str.c_str(), sizeof(data));
@@ -35,7 +36,6 @@ namespace fc {
             memset((char *) &data, 0, sizeof(data));
             auto l = strlen(str);
             if (l < sizeof(data)) {
-                memset((char *) &data, 0, sizeof(data));
                 memcpy((char *) &data, str, l);
             } else {
                 memcpy((char *) &data, str, sizeof(data));
@@ -68,8 +68,8 @@ namespace fc {
         }
 
         fixed_string &operator=(const std::string &str) {
+            memset((char *) &data, 0, sizeof(data));
             if (str.size() < sizeof(data)) {
-                memset((char *) &data, 0, sizeof(data));
                 memcpy((char *) &data, str.c_str(), str.size());
             } else {
                 memcpy((char *) &data, str.c_str(), sizeof(data));
