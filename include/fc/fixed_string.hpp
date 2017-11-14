@@ -64,7 +64,16 @@ namespace fc {
         }
 
         fixed_string &operator=(const char *str) {
-            return *this = fixed_string(str);
+            memset((char *) &data, 0, sizeof(data));
+            auto l = strlen(str);
+            if (l < sizeof(data)) {
+                memset((char *) &data, 0, sizeof(data));
+                memcpy((char *) &data, str, l);
+            } else {
+                memcpy((char *) &data, str, sizeof(data));
+            }
+
+            return *this;
         }
 
         fixed_string &operator=(const std::string &str) {
