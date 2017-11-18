@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <memory>
 #include <fc/time.hpp>
@@ -7,21 +8,26 @@
 
 namespace fc {
 
-   namespace detail { class ntp_impl; }
+    namespace detail {
+        class ntp_impl;
+    }
 
-   class ntp 
-   {
-      public:
-         ntp();
-         ~ntp();
+    class ntp {
+    public:
+        ntp();
 
-         void add_server( const std::string& hostname, uint16_t port = 123 );
-         void set_request_interval( uint32_t interval_sec );
-         void request_now();
-         optional<time_point> get_time()const;
+        ~ntp();
 
-      private:
+        void add_server(const std::string &hostname, uint16_t port = 123);
+
+        void set_request_interval(uint32_t interval_sec);
+
+        void request_now();
+
+        optional<time_point> get_time() const;
+
+    private:
         std::unique_ptr<detail::ntp_impl> my;
-   };
+    };
 
 } // namespace fc

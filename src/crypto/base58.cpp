@@ -8,7 +8,7 @@
 // Why base-58 instead of standard base-64 encoding?
 // - Don't want 0OIl characters that look the same in some fonts and
 //      could be used to create visually identical looking account numbers.
-// - A string with non-alphanumeric characters is not as easily accepted as an account number.
+// - A std::string with non-alphanumeric characters is not as easily accepted as an account number.
 // - E-mail usually won't line-break if there's no punctuation to break at.
 // - Doubleclicking selects the whole number as one word if it's all alphanumeric.
 //
@@ -19,7 +19,7 @@
 #include <vector>
 #include <limits>
 #include <algorithm>
-#include <string.h>
+#include <cstring>
 
 #include <fc/log/logger.hpp>
 #include <fc/string.hpp>
@@ -271,7 +271,7 @@ public:
         while (isspace(*psz))
             psz++;
 
-        // hex string to bignum
+        // hex std::string to bignum
         static signed char phexdigit[256] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0, 0,0xa,0xb,0xc,0xd,0xe,0xf,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0xa,0xb,0xc,0xd,0xe,0xf,0,0,0,0,0,0,0,0,0 };
         *this = 0;
         while (isxdigit(*psz))
@@ -497,7 +497,7 @@ inline bool operator>(const CBigNum& a, const CBigNum& b)  { return (BN_cmp(&a, 
 
 static const char* pszBase58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-// Encode a byte sequence as a base58-encoded string
+// Encode a byte sequence as a base58-encoded std::string
 inline std::string EncodeBase58(const unsigned char* pbegin, const unsigned char* pend)
 {
     CAutoBN_CTX pctx;
@@ -539,13 +539,13 @@ inline std::string EncodeBase58(const unsigned char* pbegin, const unsigned char
     return str;
 }
 
-// Encode a byte vector as a base58-encoded string
+// Encode a byte vector as a base58-encoded std::string
 inline std::string EncodeBase58(const std::vector<unsigned char>& vch)
 {
     return EncodeBase58(&vch[0], &vch[0] + vch.size());
 }
 
-// Decode a base58-encoded string psz into byte vector vchRet
+// Decode a base58-encoded std::string psz into byte vector vchRet
 // returns true if decoding is succesful
 inline bool DecodeBase58(const char* psz, std::vector<unsigned char>& vchRet)
 {
@@ -557,7 +557,7 @@ inline bool DecodeBase58(const char* psz, std::vector<unsigned char>& vchRet)
     while (isspace(*psz))
         psz++;
 
-    // Convert big endian string to bignum
+    // Convert big endian std::string to bignum
     for (const char* p = psz; *p; p++)
     {
         const char* p1 = strchr(pszBase58, *p);
@@ -595,7 +595,7 @@ inline bool DecodeBase58(const char* psz, std::vector<unsigned char>& vchRet)
     return true;
 }
 
-// Decode a base58-encoded string str into byte vector vchRet
+// Decode a base58-encoded std::string str into byte vector vchRet
 // returns true if decoding is succesful
 inline bool DecodeBase58(const std::string& str, std::vector<unsigned char>& vchRet)
 {
@@ -618,7 +618,7 @@ std::string to_base58( const std::vector<char>& d )
 std::vector<char> from_base58( const std::string& base58_str ) {
    std::vector<unsigned char> out;
    if( !DecodeBase58( base58_str.c_str(), out ) ) {
-     FC_THROW_EXCEPTION( parse_error_exception, "Unable to decode base58 string ${base58_str}", ("base58_str",base58_str) );
+     FC_THROW_EXCEPTION( parse_error_exception, "Unable to decode base58 std::string ${base58_str}", ("base58_str",base58_str) );
    }
    return std::vector<char>((const char*)out.data(), ((const char*)out.data())+out.size() );
 }
@@ -629,7 +629,7 @@ size_t from_base58( const std::string& base58_str, char* out_data, size_t out_da
   //slog( "%s", base58_str.c_str() );
   std::vector<unsigned char> out;
   if( !DecodeBase58( base58_str.c_str(), out ) ) {
-    FC_THROW_EXCEPTION( parse_error_exception, "Unable to decode base58 string ${base58_str}", ("base58_str",base58_str) );
+    FC_THROW_EXCEPTION( parse_error_exception, "Unable to decode base58 std::string ${base58_str}", ("base58_str",base58_str) );
   }
   FC_ASSERT( out.size() <= out_data_len );
   memcpy( out_data, out.data(), out.size() );

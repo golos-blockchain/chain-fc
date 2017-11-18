@@ -65,7 +65,7 @@
               <a href=#validfile>Checking if a file contains valid UTF-8 text</a>
             </li>
             <li>
-              <a href=#fixinvalid>Ensure that a string contains valid UTF-8 text</a>
+              <a href=#fixinvalid>Ensure that a std::string contains valid UTF-8 text</a>
             </li>
           </ul>
         <li>
@@ -100,7 +100,7 @@
       Many C++ developers miss an easy and portable way of handling Unicode encoded
       strings. The original C++ Standard (known as C++98 or C++03) is Unicode agnostic.
       C++11 provides some support for Unicode on core language and library level:
-      u8, u, and U character and string literals, char16_t and char32_t character types,
+      u8, u, and U character and std::string literals, char16_t and char32_t character types,
       u16string and u32string library classes, and codecvt support for conversions 
       between Unicode encoding forms.
       In the meantime, developers use third party libraries like ICU, OS specific capabilities, or simply
@@ -135,7 +135,7 @@
 <pre>
 <span class="preprocessor">#include &lt;fstream&gt;</span>
 <span class="preprocessor">#include &lt;iostream&gt;</span>
-<span class="preprocessor">#include &lt;string&gt;</span>
+<span class="preprocessor">#include &lt;std::string&gt;</span>
 <span class="preprocessor">#include &lt;vector&gt;</span>
 <span class="preprocessor">#include "utf8.h"</span>
 <span class="keyword">using namespace</span> std;
@@ -156,17 +156,17 @@
     }
 
     <span class="keyword">unsigned</span> line_count = <span class="literal">1</span>;
-    string line;
+    std::string line;
     <span class="comment">// Play with all the lines in the file</span>
     <span class="keyword">while</span> (getline(fs8, line)) {
        <span class="comment">// check for invalid utf-8 (for a simple yes/no check, there is also utf8::is_valid function)</span>
-        string::iterator end_it = utf8::find_invalid(line.begin(), line.end());
+        std::string::iterator end_it = utf8::find_invalid(line.begin(), line.end());
         <span class="keyword">if</span> (end_it != line.end()) {
             cout &lt;&lt; <span class=
 "literal">"Invalid UTF-8 encoding detected at line "</span> &lt;&lt; line_count &lt;&lt; <span
  class="literal">"\n"</span>;
             cout &lt;&lt; <span class=
-"literal">"This part is fine: "</span> &lt;&lt; string(line.begin(), end_it) &lt;&lt; <span
+"literal">"This part is fine: "</span> &lt;&lt; std::string(line.begin(), end_it) &lt;&lt; <span
  class="literal">"\n"</span>;
         }
 
@@ -181,11 +181,11 @@
         utf8::utf8to16(line.begin(), end_it, back_inserter(utf16line));
 
         <span class="comment">// And back to utf-8</span>
-        string utf8line; 
+        std::string utf8line;
         utf8::utf16to8(utf16line.begin(), utf16line.end(), back_inserter(utf8line));
 
         <span class="comment">// Confirm that the conversion went OK:</span>
-        <span class="keyword">if</span> (utf8line != string(line.begin(), end_it))
+        <span class="keyword">if</span> (utf8line != std::string(line.begin(), end_it))
             cout &lt;&lt; <span class=
 "literal">"Error in UTF-16 conversion at line: "</span> &lt;&lt; line_count &lt;&lt; <span
  class="literal">"\n"</span>;        
@@ -234,7 +234,7 @@ do something like:
 <pre>
     utf8::utf8to16(it, eos, back_inserter(u16string));
 </pre>
-    <h3 id="fixinvalid">Ensure that a string contains valid UTF-8 text</h3>
+    <h3 id="fixinvalid">Ensure that a std::string contains valid UTF-8 text</h3>
 <p>
 If we have some text that "probably" contains UTF-8 encoded text and we want to
 replace any invalid UTF-8 sequence with a replacement character, something like 
@@ -265,7 +265,7 @@ There is an overloaded function that enables the caller to supply their own repl
     </p>
     <p>
       Encodes a 32 bit code point as a UTF-8 sequence of octets and appends the sequence
-      to a UTF-8 string.
+      to a UTF-8 std::string.
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -348,7 +348,7 @@ assert (cp == <span class="literal">0x65e5</span>);
 assert (w == twochars + <span class="literal">3</span>);
 </pre>
     <p>
-      This function is typically used to iterate through a UTF-8 encoded string.
+      This function is typically used to iterate through a UTF-8 encoded std::string.
     </p>
     <p>
       In case of an invalid UTF-8 seqence, a <code>utf8::invalid_utf8</code> exception is
@@ -414,12 +414,12 @@ uint32_t prior(octet_iterator&amp; it, octet_iterator start);
 </pre>
     <p>
 	  <code>octet_iterator</code>: a bidirectional iterator.<br>
-      <code>it</code>: a reference pointing to an octet within a UTF-8 encoded string.
+      <code>it</code>: a reference pointing to an octet within a UTF-8 encoded std::string.
       After the function returns, it is decremented to point to the beginning of the
       previous code point.<br>
        <code>start</code>: an iterator to the beginning of the sequence where the search
       for the beginning of a code point is performed. It is a
-      safety measure to prevent passing the beginning of the string in the search for a
+      safety measure to prevent passing the beginning of the std::string in the search for a
       UTF-8 lead octet.<br>
        <span class="return_value">Return value</span>: the 32 bit representation of the
       previous code point.
@@ -438,16 +438,16 @@ assert (w == twochars);
 </pre>
     <p> 
       This function has two purposes: one is two iterate backwards through a UTF-8
-      encoded string. Note that it is usually a better idea to iterate forward instead,
+      encoded std::string. Note that it is usually a better idea to iterate forward instead,
       since <code>utf8::next</code> is faster. The second purpose is to find a beginning
-      of a UTF-8 sequence if we have a random position within a string. Note that in that
+      of a UTF-8 sequence if we have a random position within a std::string. Note that in that
       case <code>utf8::prior</code> may not detect an invalid UTF-8 sequence in some scenarios:
       for instance if there are superfluous trail octets, it will just skip them.
     </p> 
     <p>
       <code>it</code> will typically point to the beginning of
       a code point, and <code>start</code> will point to the
-      beginning of the string to ensure we don't go backwards too far. <code>it</code> is
+      beginning of the std::string to ensure we don't go backwards too far. <code>it</code> is
       decreased until it points to a lead UTF-8 octet, and then the UTF-8 sequence
       beginning with that octet is decoded to a 32 bit representation and returned.
     </p>
@@ -477,12 +477,12 @@ uint32_t previous(octet_iterator&amp; it, octet_iterator pass_start);
 </pre>
     <p>
 	  <code>octet_iterator</code>: a random access iterator.<br>
-      <code>it</code>: a reference pointing to an octet within a UTF-8 encoded string.
+      <code>it</code>: a reference pointing to an octet within a UTF-8 encoded std::string.
       After the function returns, it is decremented to point to the beginning of the
       previous code point.<br>
        <code>pass_start</code>: an iterator to the point in the sequence where the search
       for the beginning of a code point is aborted if no result was reached. It is a
-      safety measure to prevent passing the beginning of the string in the search for a
+      safety measure to prevent passing the beginning of the std::string in the search for a
       UTF-8 lead octet.<br>
        <span class="return_value">Return value</span>: the 32 bit representation of the
       previous code point.
@@ -510,7 +510,7 @@ assert (w == twochars);
     <p>
       <code>it</code> will typically point to the beginning of
       a code point, and <code>pass_start</code> will point to the octet just before the
-      beginning of the string to ensure we don't go backwards too far. <code>it</code> is
+      beginning of the std::string to ensure we don't go backwards too far. <code>it</code> is
       decreased until it points to a lead UTF-8 octet, and then the UTF-8 sequence
       beginning with that octet is decoded to a 32 bit representation and returned.
     </p>
@@ -603,9 +603,9 @@ assert (dist == <span class="literal">2</span>);
 </pre>
     <p>
       This function is used to find the length (in code points) of a UTF-8 encoded
-      string. The reason it is called <em>distance</em>, rather than, say,
+      std::string. The reason it is called <em>distance</em>, rather than, say,
       <em>length</em> is mainly because developers are used that <em>length</em> is an
-      O(1) function. Computing the length of an UTF-8 string is a linear operation, and
+      O(1) function. Computing the length of an UTF-8 std::string is a linear operation, and
       it looked better to model it after <code>std::distance</code> algorithm.
     </p>
     <p>
@@ -620,7 +620,7 @@ assert (dist == <span class="literal">2</span>);
     Available in version 1.0 and later.
     </p>
     <p>
-      Converts a UTF-16 encoded string to UTF-8.
+      Converts a UTF-16 encoded std::string to UTF-8.
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -633,13 +633,13 @@ octet_iterator utf16to8 (u16bit_iterator start, u16bit_iterator end, octet_itera
       <code>u16bit_iterator</code>: an input iterator.<br>
       <code>octet_iterator</code>: an output iterator.<br>
       <code>start</code>: an iterator pointing to the beginning of the UTF-16 encoded
-      string to convert.<br>
+      std::string to convert.<br>
        <code>end</code>: an iterator pointing to pass-the-end of the UTF-16 encoded
-      string to convert.<br>
-       <code>result</code>: an output iterator to the place in the UTF-8 string where to
+      std::string to convert.<br>
+       <code>result</code>: an output iterator to the place in the UTF-8 std::string where to
       append the result of conversion.<br>
        <span class="return_value">Return value</span>: An iterator pointing to the place
-      after the appended UTF-8 string.
+      after the appended UTF-8 std::string.
     </p>
     <p>
       Example of use:
@@ -665,7 +665,7 @@ assert (utf8result.size() == <span class="literal">10</span>);
     Available in version 1.0 and later.
     </p>
     <p>
-      Converts an UTF-8 encoded string to UTF-16
+      Converts an UTF-8 encoded std::string to UTF-16
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -677,12 +677,12 @@ u16bit_iterator utf8to16 (octet_iterator start, octet_iterator end, u16bit_itera
       <code>octet_iterator</code>: an input iterator.<br>
       <code>u16bit_iterator</code>: an output iterator.<br>
       <code>start</code>: an iterator pointing to the beginning of the UTF-8 encoded
-      string to convert. &lt; br /&gt; <code>end</code>: an iterator pointing to
-      pass-the-end of the UTF-8 encoded string to convert.<br>
-       <code>result</code>: an output iterator to the place in the UTF-16 string where to
+      std::string to convert. &lt; br /&gt; <code>end</code>: an iterator pointing to
+      pass-the-end of the UTF-8 encoded std::string to convert.<br>
+       <code>result</code>: an output iterator to the place in the UTF-16 std::string where to
       append the result of conversion.<br>
        <span class="return_value">Return value</span>: An iterator pointing to the place
-      after the appended UTF-16 string.
+      after the appended UTF-16 std::string.
     </p>
     <p>
       Example of use:
@@ -711,7 +711,7 @@ assert (utf16result[<span class="literal">3</span>] == <span class=
     Available in version 1.0 and later.
     </p>
     <p>
-      Converts a UTF-32 encoded string to UTF-8.
+      Converts a UTF-32 encoded std::string to UTF-8.
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -723,13 +723,13 @@ octet_iterator utf32to8 (u32bit_iterator start, u32bit_iterator end, octet_itera
       <code>octet_iterator</code>: an output iterator.<br>
       <code>u32bit_iterator</code>: an input iterator.<br>
       <code>start</code>: an iterator pointing to the beginning of the UTF-32 encoded
-      string to convert.<br>
+      std::string to convert.<br>
        <code>end</code>: an iterator pointing to pass-the-end of the UTF-32 encoded
-      string to convert.<br>
-       <code>result</code>: an output iterator to the place in the UTF-8 string where to
+      std::string to convert.<br>
+       <code>result</code>: an output iterator to the place in the UTF-8 std::string where to
       append the result of conversion.<br>
        <span class="return_value">Return value</span>: An iterator pointing to the place
-      after the appended UTF-8 string.
+      after the appended UTF-8 std::string.
     </p>
     <p>
       Example of use:
@@ -744,7 +744,7 @@ utf32to8(utf32string, utf32string + <span class=
 assert (utf8result.size() == <span class="literal">9</span>);
 </pre>
     <p>
-      In case of invalid UTF-32 string, a <code>utf8::invalid_code_point</code> exception
+      In case of invalid UTF-32 std::string, a <code>utf8::invalid_code_point</code> exception
       is thrown.
     </p>
     <h4>
@@ -754,7 +754,7 @@ assert (utf8result.size() == <span class="literal">9</span>);
     Available in version 1.0 and later.
     </p>
     <p>
-      Converts a UTF-8 encoded string to UTF-32.
+      Converts a UTF-8 encoded std::string to UTF-32.
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -767,13 +767,13 @@ u32bit_iterator utf8to32 (octet_iterator start, octet_iterator end, u32bit_itera
       <code>octet_iterator</code>: an input iterator.<br>
       <code>u32bit_iterator</code>: an output iterator.<br>
       <code>start</code>: an iterator pointing to the beginning of the UTF-8 encoded
-      string to convert.<br>
-       <code>end</code>: an iterator pointing to pass-the-end of the UTF-8 encoded string
+      std::string to convert.<br>
+       <code>end</code>: an iterator pointing to pass-the-end of the UTF-8 encoded std::string
       to convert.<br>
-       <code>result</code>: an output iterator to the place in the UTF-32 string where to
+       <code>result</code>: an output iterator to the place in the UTF-32 std::string where to
       append the result of conversion.<br>
        <span class="return_value">Return value</span>: An iterator pointing to the place
-      after the appended UTF-32 string.
+      after the appended UTF-32 std::string.
     </p>
     <p>
       Example of use:
@@ -798,7 +798,7 @@ assert (utf32result.size() == <span class="literal">2</span>);
     Available in version 1.0 and later.
     </p>
     <p>
-      Detects an invalid sequence within a UTF-8 string.
+      Detects an invalid sequence within a UTF-8 std::string.
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -807,12 +807,12 @@ octet_iterator find_invalid(octet_iterator start, octet_iterator end);
 </pre>
     <p>
       <code>octet_iterator</code>: an input iterator.<br>
-      <code>start</code>: an iterator pointing to the beginning of the UTF-8 string to
+      <code>start</code>: an iterator pointing to the beginning of the UTF-8 std::string to
       test for validity.<br>
-       <code>end</code>: an iterator pointing to pass-the-end of the UTF-8 string to test
+       <code>end</code>: an iterator pointing to pass-the-end of the UTF-8 std::string to test
       for validity.<br>
        <span class="return_value">Return value</span>: an iterator pointing to the first
-      invalid octet in the UTF-8 string. In case none were found, equals
+      invalid octet in the UTF-8 std::string. In case none were found, equals
       <code>end</code>.
     </p>
     <p>
@@ -827,7 +827,7 @@ octet_iterator find_invalid(octet_iterator start, octet_iterator end);
 assert (invalid == utf_invalid + <span class="literal">5</span>);
 </pre>
     <p>
-      This function is typically used to make sure a UTF-8 string is valid before
+      This function is typically used to make sure a UTF-8 std::string is valid before
       processing it with other functions. It is especially important to call it if before
       doing any of the <em>unchecked</em> operations on it.
     </p>
@@ -838,7 +838,7 @@ assert (invalid == utf_invalid + <span class="literal">5</span>);
     Available in version 1.0 and later.
     </p>
     <p>
-      Checks whether a sequence of octets is a valid UTF-8 string.
+      Checks whether a sequence of octets is a valid UTF-8 std::string.
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -848,12 +848,12 @@ assert (invalid == utf_invalid + <span class="literal">5</span>);
 </pre>
     <p>
       <code>octet_iterator</code>: an input iterator.<br>
-      <code>start</code>: an iterator pointing to the beginning of the UTF-8 string to
+      <code>start</code>: an iterator pointing to the beginning of the UTF-8 std::string to
       test for validity.<br>
-       <code>end</code>: an iterator pointing to pass-the-end of the UTF-8 string to test
+       <code>end</code>: an iterator pointing to pass-the-end of the UTF-8 std::string to test
       for validity.<br>
        <span class="return_value">Return value</span>: <code>true</code> if the sequence
-      is a valid UTF-8 string; <code>false</code> if not.
+      is a valid UTF-8 std::string; <code>false</code> if not.
     </p>
     Example of use: 
 <pre>
@@ -866,7 +866,7 @@ assert (bvalid == false);
     <p>
       <code>is_valid</code> is a shorthand for <code>find_invalid(start, end) ==
       end;</code>. You may want to use it to make sure that a byte seqence is a valid
-      UTF-8 string without the need to know where it fails if it is not valid.
+      UTF-8 std::string without the need to know where it fails if it is not valid.
     </p>
     <h4>
       utf8::replace_invalid
@@ -875,7 +875,7 @@ assert (bvalid == false);
     Available in version 2.0 and later.
     </p>
     <p>
-      Replaces all invalid UTF-8 sequences within a string with a replacement marker.
+      Replaces all invalid UTF-8 sequences within a std::string with a replacement marker.
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -891,16 +891,16 @@ output_iterator replace_invalid(octet_iterator start, octet_iterator end, output
     <p>
       <code>octet_iterator</code>: an input iterator.<br>
       <code>output_iterator</code>: an output iterator.<br>
-      <code>start</code>: an iterator pointing to the beginning of the UTF-8 string to
+      <code>start</code>: an iterator pointing to the beginning of the UTF-8 std::string to
       look for invalid UTF-8 sequences.<br>
-       <code>end</code>: an iterator pointing to pass-the-end of the UTF-8 string to look
+       <code>end</code>: an iterator pointing to pass-the-end of the UTF-8 std::string to look
       for invalid UTF-8 sequences.<br>
        <code>out</code>: An output iterator to the range where the result of replacement
       is stored.<br>
        <code>replacement</code>: A Unicode code point for the replacement marker. The
       version without this parameter assumes the value <code>0xfffd</code><br>
        <span class="return_value">Return value</span>: An iterator pointing to the place
-      after the UTF-8 string with replaced invalid sequences.
+      after the UTF-8 std::string with replaced invalid sequences.
     </p>
     <p>
       Example of use:
@@ -919,7 +919,7 @@ assert (std::equal(replace_invalid_result.begin(), replace_invalid_result.end(),
 </pre>
     <p>
       <code>replace_invalid</code> does not perform in-place replacement of invalid
-      sequences. Rather, it produces a copy of the original string with the invalid
+      sequences. Rather, it produces a copy of the original std::string with the invalid
       sequences replaced with a replacement marker. Therefore, <code>out</code> must not
       be in the <code>[start, end]</code> range.
     </p>
@@ -1196,7 +1196,7 @@ utf8::iterator i (s.begin(), s.begin(), s.end());
     </p>
     <p>
       Encodes a 32 bit code point as a UTF-8 sequence of octets and appends the sequence
-      to a UTF-8 string.
+      to a UTF-8 std::string.
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -1325,7 +1325,7 @@ uint32_t prior(octet_iterator&amp; it);
    
 </pre>
     <p>
-      <code>it</code>: a reference pointing to an octet within a UTF-8 encoded string.
+      <code>it</code>: a reference pointing to an octet within a UTF-8 encoded std::string.
       After the function returns, it is decremented to point to the beginning of the
       previous code point.<br>
        <span class="return_value">Return value</span>: the 32 bit representation of the
@@ -1364,7 +1364,7 @@ uint32_t previous(octet_iterator&amp; it);
    
 </pre>
     <p>
-      <code>it</code>: a reference pointing to an octet within a UTF-8 encoded string.
+      <code>it</code>: a reference pointing to an octet within a UTF-8 encoded std::string.
       After the function returns, it is decremented to point to the beginning of the
       previous code point.<br>
        <span class="return_value">Return value</span>: the 32 bit representation of the
@@ -1477,7 +1477,7 @@ assert (dist == <span class="literal">2</span>);
     Available in version 1.0 and later.
     </p>
     <p>
-      Converts a UTF-16 encoded string to UTF-8.
+      Converts a UTF-16 encoded std::string to UTF-8.
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -1488,13 +1488,13 @@ octet_iterator utf16to8 (u16bit_iterator start, u16bit_iterator end, octet_itera
 </pre>
     <p>
       <code>start</code>: an iterator pointing to the beginning of the UTF-16 encoded
-      string to convert.<br>
+      std::string to convert.<br>
        <code>end</code>: an iterator pointing to pass-the-end of the UTF-16 encoded
-      string to convert.<br>
-       <code>result</code>: an output iterator to the place in the UTF-8 string where to
+      std::string to convert.<br>
+       <code>result</code>: an output iterator to the place in the UTF-8 std::string where to
       append the result of conversion.<br>
        <span class="return_value">Return value</span>: An iterator pointing to the place
-      after the appended UTF-8 string.
+      after the appended UTF-8 std::string.
     </p>
     <p>
       Example of use:
@@ -1520,7 +1520,7 @@ assert (utf8result.size() == <span class="literal">10</span>);
     Available in version 1.0 and later.
     </p>
     <p>
-      Converts an UTF-8 encoded string to UTF-16
+      Converts an UTF-8 encoded std::string to UTF-16
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -1530,12 +1530,12 @@ u16bit_iterator utf8to16 (octet_iterator start, octet_iterator end, u16bit_itera
 </pre>
     <p>
       <code>start</code>: an iterator pointing to the beginning of the UTF-8 encoded
-      string to convert. &lt; br /&gt; <code>end</code>: an iterator pointing to
-      pass-the-end of the UTF-8 encoded string to convert.<br>
-       <code>result</code>: an output iterator to the place in the UTF-16 string where to
+      std::string to convert. &lt; br /&gt; <code>end</code>: an iterator pointing to
+      pass-the-end of the UTF-8 encoded std::string to convert.<br>
+       <code>result</code>: an output iterator to the place in the UTF-16 std::string where to
       append the result of conversion.<br>
        <span class="return_value">Return value</span>: An iterator pointing to the place
-      after the appended UTF-16 string.
+      after the appended UTF-16 std::string.
     </p>
     <p>
       Example of use:
@@ -1563,7 +1563,7 @@ assert (utf16result[<span class="literal">3</span>] == <span class=
     Available in version 1.0 and later.
     </p>
     <p>
-      Converts a UTF-32 encoded string to UTF-8.
+      Converts a UTF-32 encoded std::string to UTF-8.
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -1574,13 +1574,13 @@ octet_iterator utf32to8 (u32bit_iterator start, u32bit_iterator end, octet_itera
 </pre>
     <p>
       <code>start</code>: an iterator pointing to the beginning of the UTF-32 encoded
-      string to convert.<br>
+      std::string to convert.<br>
        <code>end</code>: an iterator pointing to pass-the-end of the UTF-32 encoded
-      string to convert.<br>
-       <code>result</code>: an output iterator to the place in the UTF-8 string where to
+      std::string to convert.<br>
+       <code>result</code>: an output iterator to the place in the UTF-8 std::string where to
       append the result of conversion.<br>
        <span class="return_value">Return value</span>: An iterator pointing to the place
-      after the appended UTF-8 string.
+      after the appended UTF-8 std::string.
     </p>
     <p>
       Example of use:
@@ -1605,7 +1605,7 @@ assert (utf8result.size() == <span class="literal">9</span>);
     Available in version 1.0 and later.
     </p>
     <p>
-      Converts a UTF-8 encoded string to UTF-32.
+      Converts a UTF-8 encoded std::string to UTF-32.
     </p>
 <pre>
 <span class="keyword">template</span> &lt;<span class=
@@ -1615,13 +1615,13 @@ u32bit_iterator utf8to32 (octet_iterator start, octet_iterator end, u32bit_itera
 </pre>
     <p>
       <code>start</code>: an iterator pointing to the beginning of the UTF-8 encoded
-      string to convert.<br>
-       <code>end</code>: an iterator pointing to pass-the-end of the UTF-8 encoded string
+      std::string to convert.<br>
+       <code>end</code>: an iterator pointing to pass-the-end of the UTF-8 encoded std::string
       to convert.<br>
-       <code>result</code>: an output iterator to the place in the UTF-32 string where to
+       <code>result</code>: an output iterator to the place in the UTF-32 std::string where to
       append the result of conversion.<br>
        <span class="return_value">Return value</span>: An iterator pointing to the place
-      after the appended UTF-32 string.
+      after the appended UTF-32 std::string.
     </p>
     <p>
       Example of use:
@@ -1718,7 +1718,7 @@ assert (*un_it == <span class="literal">0x10346</span>);
     </p>
     <ol>
       <li>
-        Generic: for better or worse, there are many C++ string classes out there, and
+        Generic: for better or worse, there are many C++ std::string classes out there, and
         the library should work with as many of them as possible.
       </li>
       <li>
@@ -1758,7 +1758,7 @@ assert (*un_it == <span class="literal">0x10346</span>);
         <a href=
         "http://www.gtkmm.org/gtkmm2/docs/tutorial/html/ch03s04.html">Glib::ustring</a>.
         A class specifically made to work with UTF-8 strings, and also feel like
-        <code>std::string</code>. If you prefer to have yet another string class in your
+        <code>std::string</code>. If you prefer to have yet another std::string class in your
         code, it may be worth a look. Be aware of the licensing issues, though.
       </li>
       <li>

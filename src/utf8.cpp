@@ -11,41 +11,40 @@
 
 namespace fc {
 
-   bool is_utf8( const std::string& str )
-   {
-      utf8::find_invalid(str.begin(), str.end());
-      return utf8::is_valid( str.begin(), str.end() );
-   }
+    bool is_utf8(const std::string &str) {
+        utf8::find_invalid(str.begin(), str.end());
+        return utf8::is_valid(str.begin(), str.end());
+    }
 
-   string prune_invalid_utf8( const string& str ) {
-      string result;
+    std::string prune_invalid_utf8(const std::string &str) {
+        std::string result;
 
-      auto itr = utf8::find_invalid(str.begin(), str.end()); 
-      if( itr == str.end() ) return str;
+        auto itr = utf8::find_invalid(str.begin(), str.end());
+        if (itr == str.end()) {
+            return str;
+        }
 
-      result = string( str.begin(), itr );
-      while( itr != str.end() ) {
-         ++itr;
-         auto start = itr;
-         itr = utf8::find_invalid( start, str.end()); 
-         result += string( start, itr );
-      }
-      return result;
-   }
+        result = std::string(str.begin(), itr);
+        while (itr != str.end()) {
+            ++itr;
+            auto start = itr;
+            itr = utf8::find_invalid(start, str.end());
+            result += std::string(start, itr);
+        }
+        return result;
+    }
 
-   void decodeUtf8(const std::string& input, std::wstring* storage)
-   {
-     assert(storage != nullptr);
+    void decodeUtf8(const std::string &input, std::wstring *storage) {
+        assert(storage != nullptr);
 
-     utf8::utf8to32(input.begin(), input.end(), std::back_inserter(*storage));
-   }
+        utf8::utf8to32(input.begin(), input.end(), std::back_inserter(*storage));
+    }
 
-   void encodeUtf8(const std::wstring& input, std::string* storage)
-   {
-     assert(storage != nullptr);
+    void encodeUtf8(const std::wstring &input, std::string *storage) {
+        assert(storage != nullptr);
 
-     utf8::utf32to8(input.begin(), input.end(), std::back_inserter(*storage));
-   }
+        utf8::utf32to8(input.begin(), input.end(), std::back_inserter(*storage));
+    }
 
 } ///namespace fc
 

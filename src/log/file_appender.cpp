@@ -61,7 +61,7 @@ namespace fc {
              FC_ASSERT( cfg.rotate );
              fc::time_point now = time_point::now();
              fc::time_point_sec start_time = get_file_start_time( now, cfg.rotation_interval );
-             string timestamp_string = start_time.to_non_delimited_iso_string();
+             std::string timestamp_string = start_time.to_non_delimited_iso_string();
              fc::path link_filename = cfg.filename;
              fc::path log_filename = link_filename.parent_path() / (link_filename.filename().string() + "." + timestamp_string);
 
@@ -92,17 +92,17 @@ namespace fc {
 
              /* Delete old log files */
              fc::time_point limit_time = now - cfg.rotation_limit;
-             string link_filename_string = link_filename.filename().string();
+             std::string link_filename_string = link_filename.filename().string();
              directory_iterator itr(link_filename.parent_path());
              for( ; itr != directory_iterator(); itr++ )
              {
                  try
                  {
-                     string current_filename = itr->filename().string();
+                     std::string current_filename = itr->filename().string();
                      if (current_filename.compare(0, link_filename_string.size(), link_filename_string) != 0 ||
                          current_filename.size() <= link_filename_string.size() + 1)
                        continue;
-                     string current_timestamp_str = current_filename.substr(link_filename_string.size() + 1,
+                     std::string current_timestamp_str = current_filename.substr(link_filename_string.size() + 1,
                                                                             timestamp_string.size());
                      fc::time_point_sec current_timestamp = fc::time_point_sec::from_iso_string( current_timestamp_str );
                      if( current_timestamp < start_time )
@@ -161,10 +161,10 @@ namespace fc {
    {
       std::stringstream line;
       //line << (m.get_context().get_timestamp().time_since_epoch().count() % (1000ll*1000ll*60ll*60))/1000 <<"ms ";
-      line << string(m.get_context().get_timestamp()) << " ";
-      line << std::setw( 21 ) << (m.get_context().get_thread_name().substr(0,9) + string(":") + m.get_context().get_task_name()).c_str() << " ";
+      line << std::string(m.get_context().get_timestamp()) << " ";
+      line << std::setw( 21 ) << (m.get_context().get_thread_name().substr(0,9) + std::string(":") + m.get_context().get_task_name()).c_str() << " ";
 
-      string method_name = m.get_context().get_method();
+      std::string method_name = m.get_context().get_method();
       // strip all leading scopes...
       if( method_name.size() )
       {
@@ -180,12 +180,12 @@ namespace fc {
       }
 
       line << "] ";
-      fc::string message = fc::format_string( m.get_format(), m.get_data() );
+      std::string message = fc::format_string( m.get_format(), m.get_data() );
       line << message.c_str();
 
       //fc::variant lmsg(m);
 
-      // fc::string fmt_str = fc::format_string( my->cfg.format, mutable_variant_object(m.get_context())( "message", message)  );
+      // std::string fmt_str = fc::format_string( my->cfg.format, mutable_variant_object(m.get_context())( "message", message)  );
 
       {
         fc::scoped_lock<boost::mutex> lock( my->slock );

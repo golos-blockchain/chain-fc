@@ -11,11 +11,11 @@ namespace fc {
     public:
         sha224();
 
-        explicit sha224(const string &hex_str);
+        explicit sha224(const std::string &hex_str);
 
-        string str() const;
+        std::string str() const;
 
-        operator string() const;
+        operator std::string() const;
 
         char *data() const;
 
@@ -25,7 +25,7 @@ namespace fc {
 
         static sha224 hash(const char *d, uint32_t dlen);
 
-        static sha224 hash(const string &);
+        static sha224 hash(const std::string &);
 
         template<typename T>
         static sha224 hash(const T &t) {

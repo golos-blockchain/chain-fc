@@ -10,8 +10,8 @@ namespace fc {
     class gelf_appender : public appender {
     public:
         struct config {
-            string endpoint = "127.0.0.1:12201";
-            string host = "fc"; // the name of the host, source or application that sent this message (just passed through to GELF server)
+            std::string endpoint = "127.0.0.1:12201";
+            std::string host = "fc"; // the name of the host, source or application that sent this message (just passed through to GELF server)
         };
 
         gelf_appender(const variant &args);

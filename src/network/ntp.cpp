@@ -4,7 +4,7 @@
 #include <fc/network/ip.hpp>
 #include <fc/thread/thread.hpp>
 
-#include <stdint.h>
+#include <cstdint>
 #include "../byteswap.hpp"
 
 #include <atomic>

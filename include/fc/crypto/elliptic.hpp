@@ -185,13 +185,13 @@ namespace fc {
 
             static extended_public_key deserialize(const extended_key_data &data);
 
-            fc::string str() const;
+            std::string str() const;
 
-            fc::string to_base58() const {
+            std::string to_base58() const {
                 return str();
             }
 
-            static extended_public_key from_base58(const fc::string &base58);
+            static extended_public_key from_base58(const std::string &base58);
 
             public_key generate_p(int i) const;
 
@@ -220,15 +220,15 @@ namespace fc {
 
             static extended_private_key deserialize(const extended_key_data &data);
 
-            fc::string str() const;
+            std::string str() const;
 
-            fc::string to_base58() const {
+            std::string to_base58() const {
                 return str();
             }
 
-            static extended_private_key from_base58(const fc::string &base58);
+            static extended_private_key from_base58(const std::string &base58);
 
-            static extended_private_key generate_master(const fc::string &seed);
+            static extended_private_key generate_master(const std::string &seed);
 
             static extended_private_key generate_master(const char *seed, uint32_t seed_len);
 
@@ -286,7 +286,7 @@ namespace fc {
                                           const blind_factor_type &commit_blind, const blind_factor_type &nonce,
                                           int8_t base10_exp, uint8_t min_bits, uint64_t actual_value);
 
-        bool verify_range_proof_rewind(blind_factor_type &blind_out, uint64_t &value_out, string &message_out,
+        bool verify_range_proof_rewind(blind_factor_type &blind_out, uint64_t &value_out, std::string &message_out,
                                        const blind_factor_type &nonce, uint64_t &min_val, uint64_t &max_val,
                                        commitment_type commit, const range_proof_type &proof);
 

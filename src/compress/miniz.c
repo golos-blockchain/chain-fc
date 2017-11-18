@@ -299,7 +299,7 @@ typedef struct mz_stream_s
 
 typedef mz_stream *mz_streamp;
 
-// Returns the version string of miniz.c.
+// Returns the version std::string of miniz.c.
 const char *mz_version(void);
 
 // mz_deflateInit() initializes a compressor with default options:
@@ -384,7 +384,7 @@ int mz_inflateEnd(mz_streamp pStream);
 // Returns MZ_OK on success, or one of the error codes from mz_inflate() on failure.
 int mz_uncompress(unsigned char *pDest, mz_ulong *pDest_len, const unsigned char *pSource, mz_ulong source_len);
 
-// Returns a string description of the specified error code, or NULL if the error code is invalid.
+// Returns a std::string description of the specified error code, or NULL if the error code is invalid.
 const char *mz_error(int err);
 
 // Redefine zlib-compatible names to miniz equivalents, so miniz.c can be used as a drop-in replacement for the subset of zlib that miniz.c supports.
@@ -933,7 +933,7 @@ typedef unsigned char mz_validate_uint16[sizeof(mz_uint16)==2 ? 1 : -1];
 typedef unsigned char mz_validate_uint32[sizeof(mz_uint32)==4 ? 1 : -1];
 typedef unsigned char mz_validate_uint64[sizeof(mz_uint64)==8 ? 1 : -1];
 
-#include <string.h>
+#include <cstring>
 #include <assert.h>
 
 #define MZ_ASSERT(x) assert(x)

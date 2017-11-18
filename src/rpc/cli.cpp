@@ -4,10 +4,13 @@
 #include <iostream>
 
 #ifndef WIN32
+
 #include <unistd.h>
+
 #endif
 
 #ifdef HAVE_READLINE
+
 # include <readline/readline.h>
 # include <readline/history.h>
 // I don't know exactly what version of readline we need.  I know the 4.2 version that ships on some macs is
@@ -28,225 +31,209 @@
 # endif
 #endif
 
-namespace fc { namespace rpc {
+namespace fc {
+    namespace rpc {
 
-static std::vector<std::string>& cli_commands()
-{
-   static std::vector<std::string>* cmds = new std::vector<std::string>();
-   return *cmds;
-}
+        static std::vector<std::string> &cli_commands() {
+            static std::vector<std::string> *cmds = new std::vector<std::string>();
+            return *cmds;
+        }
 
-cli::~cli()
-{
-   if( run_complete_.valid() )
-   {
-      stop();
-   }
-}
+        cli::~cli() {
+            if (run_complete_.valid()) {
+                stop();
+            }
+        }
 
-variant cli::send_call( api_id_type api_id, string method_name, variants args /* = variants() */ )
-{
-   FC_ASSERT(false);
-}
+        variant cli::send_call(api_id_type api_id, std::string method_name, variants args /* = variants() */ ) {
+            FC_ASSERT(false);
+        }
 
-variant cli::send_callback( uint64_t callback_id, variants args /* = variants() */ )
-{
-   FC_ASSERT(false);
-}
+        variant cli::send_callback(uint64_t callback_id, variants args /* = variants() */ ) {
+            FC_ASSERT(false);
+        }
 
-void cli::send_notice( uint64_t callback_id, variants args /* = variants() */ )
-{
-   FC_ASSERT(false);
-}
+        void cli::send_notice(uint64_t callback_id, variants args /* = variants() */ ) {
+            FC_ASSERT(false);
+        }
 
-void cli::start()
-{
-   cli_commands() = get_method_names(0);
-   run_complete_ = fc::async( [&](){ run(); } );
-}
+        void cli::start() {
+            cli_commands() = get_method_names(0);
+            run_complete_ = fc::async([&]() {
+                run();
+            });
+        }
 
-void cli::stop()
-{
-   run_complete_.cancel();
-   run_complete_.wait();
-}
+        void cli::stop() {
+            run_complete_.cancel();
+            run_complete_.wait();
+        }
 
-void cli::wait()
-{
-   run_complete_.wait();   
-}
+        void cli::wait() {
+            run_complete_.wait();
+        }
 
-void cli::format_result( const string& method, std::function<string(variant,const variants&)> formatter)
-{
-   result_formatters_[method] = formatter;
-}
+        void cli::format_result(const std::string &method, std::function<std::string(variant, const variants &)> formatter) {
+            result_formatters_[method] = formatter;
+        }
 
-void cli::set_prompt( const string& prompt )
-{
-   prompt_ = prompt;
-}
+        void cli::set_prompt(const std::string &prompt) {
+            prompt_ = prompt;
+        }
 
-std::string cli::exec_command ( const std::string & command) {
-   std::string output ;
-   try {
-      std::string line = command;
+        std::string cli::exec_command(const std::string &command) {
+            std::string output;
+            try {
+                std::string line = command;
 
-      line += char(EOF);
-      fc::variants args = fc::json::variants_from_string(line);
+                line += char(EOF);
+                fc::variants args = fc::json::variants_from_string(line);
 
-      if ( args.size() == 0 ) {
-         return NULL;
-      }
+                if (args.size() == 0) {
+                    return NULL;
+                }
 
-      const string& method = args[0].get_string();
+                const std::string &method = args[0].get_string();
 
-      auto result = receive_call ( 0, method, fc::variants ( args.begin() + 1, args.end() ) ) ;
+                auto result = receive_call(0, method, fc::variants(args.begin() + 1, args.end()));
 
-      auto itr = result_formatters_.find ( method ) ;
-
-      
-      if ( itr == result_formatters_.end() ) {
-         output = fc::json::to_pretty_string ( result ) ;
-      }
-      else {
-         output = ( itr -> second ( result, args ) ) ;
-         output = fc::json::to_pretty_string ( output ) ;
-      }
-   }
-   catch ( const fc::exception& e ) {
-      std::cout << e.to_detail_string() << '\n';
-   }
-   return output ;
-}
-
-void cli::run()
-{
-   while( !run_complete_.canceled() )
-   {
-      try {
-         std::string line;
-         try {
-            getline( prompt_.c_str(), line );
-         }
-         catch ( const fc::eof_exception& e ) {
-            break;
-         }
-         std::cout << line << "\n";
-         line += char(EOF);
-         fc::variants args = fc::json::variants_from_string(line);;
-         if( args.size() == 0 ) {
-            continue;
-         }
-
-         const string& method = args[0].get_string();
-
-         auto result = receive_call( 0, method, variants( args.begin()+1,args.end() ) );
-         auto itr = result_formatters_.find( method );
-         
-         if ( itr == result_formatters_.end() ) {
-            std::cout << fc::json::to_pretty_string( result ) << "\n";
-         }
-         else {
-            std::cout << itr->second( result, args ) << "\n";
-         }
-      }
-      catch ( const fc::exception& e ) {
-         std::cout << e.to_detail_string() << "\n";
-      }
-   }
-}
+                auto itr = result_formatters_.find(method);
 
 
-char * dupstr (const char* s) {
-   char *r;
+                if (itr == result_formatters_.end()) {
+                    output = fc::json::to_pretty_string(result);
+                } else {
+                    output = (itr->second(result, args));
+                    output = fc::json::to_pretty_string(output);
+                }
+            } catch (const fc::exception &e) {
+                std::cout << e.to_detail_string() << '\n';
+            }
+            return output;
+        }
 
-   r = (char*) malloc ((strlen (s) + 1));
-   strcpy (r, s);
-   return (r);
-}
+        void cli::run() {
+            while (!run_complete_.canceled()) {
+                try {
+                    std::string line;
+                    try {
+                        getline(prompt_.c_str(), line);
+                    } catch (const fc::eof_exception &e) {
+                        break;
+                    }
+                    std::cout << line << "\n";
+                    line += char(EOF);
+                    fc::variants args = fc::json::variants_from_string(line);;
+                    if (args.size() == 0) {
+                        continue;
+                    }
 
-char* my_generator(const char* text, int state)
-{
-   static int list_index, len;
-   const char *name;
+                    const std::string &method = args[0].get_string();
 
-   if (!state) {
-      list_index = 0;
-      len = strlen (text);
-   }
+                    auto result = receive_call(0, method, variants(args.begin() + 1, args.end()));
+                    auto itr = result_formatters_.find(method);
 
-   auto& cmd = cli_commands();
-
-   while( list_index < cmd.size() ) 
-   {
-      name = cmd[list_index].c_str();
-      list_index++;
-
-      if (strncmp (name, text, len) == 0)
-         return (dupstr(name));
-   }
-
-   /* If no names matched, then return NULL. */
-   return ((char *)NULL);
-}
+                    if (itr == result_formatters_.end()) {
+                        std::cout << fc::json::to_pretty_string(result) << "\n";
+                    } else {
+                        std::cout << itr->second(result, args) << "\n";
+                    }
+                } catch (const fc::exception &e) {
+                    std::cout << e.to_detail_string() << "\n";
+                }
+            }
+        }
 
 
-static char** cli_completion( const char * text , int start, int end)
-{
-   char **matches;
-   matches = (char **)NULL;
+        char *dupstr(const char *s) {
+            char *r;
+
+            r = (char *) malloc((strlen(s) + 1));
+            strcpy(r, s);
+            return (r);
+        }
+
+        char *my_generator(const char *text, int state) {
+            static int list_index, len;
+            const char *name;
+
+            if (!state) {
+                list_index = 0;
+                len = strlen(text);
+            }
+
+            auto &cmd = cli_commands();
+
+            while (list_index < cmd.size()) {
+                name = cmd[list_index].c_str();
+                list_index++;
+
+                if (strncmp(name, text, len) == 0) {
+                    return (dupstr(name));
+                }
+            }
+
+            /* If no names matched, then return NULL. */
+            return ((char *) NULL);
+        }
+
+
+        static char **cli_completion(const char *text, int start, int end) {
+            char **matches;
+            matches = (char **) NULL;
 
 #ifdef HAVE_READLINE
-   if (start == 0)
-      matches = rl_completion_matches ((char*)text, &my_generator);
-   else
-      rl_bind_key('\t',rl_abort);
+            if (start == 0) {
+                matches = rl_completion_matches((char *) text, &my_generator);
+            } else {
+                rl_bind_key('\t', rl_abort);
+            }
 #endif
 
-   return (matches);
-}
+            return (matches);
+        }
 
 
-void cli::getline( const fc::string& prompt, fc::string& line)
-{
-   // getting file descriptor for C++ streams is near impossible
-   // so we just assume it's the same as the C stream...
+        void cli::getline(const std::string &prompt, std::string &line) {
+            // getting file descriptor for C++ streams is near impossible
+            // so we just assume it's the same as the C stream...
 #ifdef HAVE_READLINE
-#ifndef WIN32   
-   if( isatty( fileno( stdin ) ) )
+#ifndef WIN32
+            if (isatty(fileno(stdin)))
 #else
-   // it's implied by
-   // https://msdn.microsoft.com/en-us/library/f4s0ddew.aspx
-   // that this is the proper way to do this on Windows, but I have
-   // no access to a Windows compiler and thus,
-   // no idea if this actually works
-   if( _isatty( _fileno( stdin ) ) )
+                // it's implied by
+                // https://msdn.microsoft.com/en-us/library/f4s0ddew.aspx
+                // that this is the proper way to do this on Windows, but I have
+                // no access to a Windows compiler and thus,
+                // no idea if this actually works
+                if( _isatty( _fileno( stdin ) ) )
 #endif
-   {
-      rl_attempted_completion_function = cli_completion;
+            {
+                rl_attempted_completion_function = cli_completion;
 
-      static fc::thread getline_thread("getline");
-      getline_thread.async( [&](){
-         char* line_read = nullptr;
-         std::cout.flush(); //readline doesn't use cin, so we must manually flush _out
-         line_read = readline(prompt.c_str());
-         if( line_read == nullptr )
-            FC_THROW_EXCEPTION( fc::eof_exception, "" );
-         rl_bind_key( '\t', rl_complete );
-         if( *line_read )
-            add_history(line_read);
-         line = line_read;
-         free(line_read);
-      }).wait();
-   }
-   else
+                static fc::thread getline_thread("getline");
+                getline_thread.async([&]() {
+                    char *line_read = nullptr;
+                    std::cout.flush(); //readline doesn't use cin, so we must manually flush _out
+                    line_read = readline(prompt.c_str());
+                    if (line_read == nullptr)
+                        FC_THROW_EXCEPTION(fc::eof_exception, "");
+                    rl_bind_key('\t', rl_complete);
+                    if (*line_read) {
+                        add_history(line_read);
+                    }
+                    line = line_read;
+                    free(line_read);
+                }).wait();
+            } else
 #endif
-   {
-      std::cout << prompt;
-      // sync_call( cin_thread, [&](){ std::getline( *input_stream, line ); }, "getline");
-      fc::getline( fc::cin, line );
-      return;
-   }
-}
+            {
+                std::cout << prompt;
+                // sync_call( cin_thread, [&](){ std::getline( *input_stream, line ); }, "getline");
+                fc::getline(fc::cin, line);
+                return;
+            }
+        }
 
-} } // namespace fc::rpc
+    }
+} // namespace fc::rpc

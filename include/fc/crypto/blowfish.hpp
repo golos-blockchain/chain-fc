@@ -37,7 +37,7 @@ http://www.counterpane.com/vectors.txt
 Test vectors by Eric Young.  These tests all assume Blowfish with 16
 rounds.
 
-All data is shown as a hex string with 012345 loading as
+All data is shown as a hex std::string with 012345 loading as
 data[0]=0x01;
 data[1]=0x23;
 data[2]=0x45;
@@ -121,56 +121,73 @@ E73214A2822139CA62B343CC5B65587310DD908D0C241B2263C2CF80DA
 */
 
 #pragma once
-#include <stdint.h>
+
+#include <cstdint>
 
 namespace fc {
 
-//Block Structure
-struct sblock
-{
-	//Constructors
-	sblock(unsigned int l=0, unsigned int r=0) : m_uil(l), m_uir(r) {}
-	//Copy Constructor
-	sblock(const sblock& roBlock) : m_uil(roBlock.m_uil), m_uir(roBlock.m_uir) {}
-	sblock& operator^=(sblock& b) { m_uil ^= b.m_uil; m_uir ^= b.m_uir; return *this; }
-	unsigned int m_uil, m_uir;
-};
+    //Block Structure
+    struct sblock {
+        //Constructors
+        sblock(unsigned int l = 0, unsigned int r = 0) : m_uil(l), m_uir(r) {
+        }
 
-class blowfish
-{
-public:
-	enum { ECB=0, CBC=1, CFB=2 };
+        //Copy Constructor
+        sblock(const sblock &roBlock) : m_uil(roBlock.m_uil), m_uir(roBlock.m_uir) {
+        }
 
-	//Constructor - Initialize the P and S boxes for a given Key
-	blowfish();
-	void start(unsigned char* ucKey, uint64_t n, const sblock& roChain = sblock(0UL,0UL));
+        sblock &operator^=(sblock &b) {
+            m_uil ^= b.m_uil;
+            m_uir ^= b.m_uir;
+            return *this;
+        }
 
-	//Resetting the chaining block
-	void reset_chain() { m_oChain = m_oChain0; }
+        unsigned int m_uil, m_uir;
+    };
 
-	// encrypt/decrypt Buffer in Place
-	void encrypt(unsigned char* buf, uint64_t n, int iMode=CFB);
-	void decrypt(unsigned char* buf, uint64_t n, int iMode=CFB);
+    class blowfish {
+    public:
+        enum {
+            ECB = 0, CBC = 1, CFB = 2
+        };
 
-	// encrypt/decrypt from Input Buffer to Output Buffer
-	void encrypt(const unsigned char* in, unsigned char* out, uint64_t n, int iMode=CFB);
-	void decrypt(const unsigned char* in, unsigned char* out, uint64_t n, int iMode=CFB);
+        //Constructor - Initialize the P and S boxes for a given Key
+        blowfish();
 
-//Private Functions
-private:
-	unsigned int F(unsigned int ui);
-	void encrypt(sblock&);
-	void decrypt(sblock&);
+        void start(unsigned char *ucKey, uint64_t n, const sblock &roChain = sblock(0UL, 0UL));
 
-private:
-	//The Initialization Vector, by default {0, 0}
-	sblock m_oChain0;
-	sblock m_oChain;
-	unsigned int m_auiP[18];
-	unsigned int m_auiS[4][256];
-	static const unsigned int scm_auiInitP[18];
-	static const unsigned int scm_auiInitS[4][256];
-};
+        //Resetting the chaining block
+        void reset_chain() {
+            m_oChain = m_oChain0;
+        }
+
+        // encrypt/decrypt Buffer in Place
+        void encrypt(unsigned char *buf, uint64_t n, int iMode = CFB);
+
+        void decrypt(unsigned char *buf, uint64_t n, int iMode = CFB);
+
+        // encrypt/decrypt from Input Buffer to Output Buffer
+        void encrypt(const unsigned char *in, unsigned char *out, uint64_t n, int iMode = CFB);
+
+        void decrypt(const unsigned char *in, unsigned char *out, uint64_t n, int iMode = CFB);
+
+        //Private Functions
+    private:
+        unsigned int F(unsigned int ui);
+
+        void encrypt(sblock &);
+
+        void decrypt(sblock &);
+
+    private:
+        //The Initialization Vector, by default {0, 0}
+        sblock m_oChain0;
+        sblock m_oChain;
+        unsigned int m_auiP[18];
+        unsigned int m_auiS[4][256];
+        static const unsigned int scm_auiInitP[18];
+        static const unsigned int scm_auiInitS[4][256];
+    };
 
 
 } // namespace fc

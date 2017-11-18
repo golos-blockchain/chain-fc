@@ -44,7 +44,7 @@ namespace fc
       }
     }
 
-    uint128::uint128(const std::string &sz) 
+    uint128::uint128(const std::string &sz)
     :hi(0), lo(0) 
     {
       // do we have at least one character?

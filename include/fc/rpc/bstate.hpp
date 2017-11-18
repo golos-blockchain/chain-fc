@@ -38,27 +38,27 @@ namespace fc {
 
             ~bstate();
 
-            void add_method(const fc::string &name, method m);
+            void add_method(const std::string &name, method m);
 
-            void remove_method(const fc::string &name);
+            void remove_method(const std::string &name);
 
-            result_type local_call(const string &method_name, const params_type &args);
+            result_type local_call(const std::string &method_name, const params_type &args);
 
             void handle_reply(const bresponse &response);
 
-            brequest start_remote_call(const string &method_name, params_type args);
+            brequest start_remote_call(const std::string &method_name, params_type args);
 
             result_type wait_for_response(uint64_t request_id);
 
             void close();
 
-            void on_unhandled(const std::function<result_type(const string &, const params_type &)> &unhandled);
+            void on_unhandled(const std::function<result_type(const std::string &, const params_type &)> &unhandled);
 
         private:
             uint64_t _next_id = 1;
             std::unordered_map<uint64_t, fc::promise<result_type>::ptr> _awaiting;
             std::unordered_map<std::string, method> _methods;
-            std::function<result_type(const string &, const params_type &)> _unhandled;
+            std::function<result_type(const std::string &, const params_type &)> _unhandled;
         };
     }
 }  // namespace  fc::rpc

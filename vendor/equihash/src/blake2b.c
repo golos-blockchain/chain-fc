@@ -401,7 +401,7 @@ int crypto_hash( unsigned char *out, unsigned char *in, unsigned long long inlen
 #endif
 
 #if defined(BLAKE2B_SELFTEST)
-#include <string.h>
+#include <cstring>
 #include "blake2-kat.h"
 int main( int argc, char **argv )
 {

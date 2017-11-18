@@ -12,15 +12,15 @@ namespace fc {
   namespace bp = boost::process;
   namespace io = boost::iostreams;
 
-fc::path find_executable_in_path( const fc::string name ) {
+fc::path find_executable_in_path( const std::string name ) {
   try {
-    return fc::string(bp::find_executable_in_path( std::string(name), "" ));
+    return std::string(bp::find_executable_in_path( std::string(name), "" ));
   } catch (...) {
     const char* p = std::getenv("PATH");
     FC_THROW( "Unable to find executable ${exe} in path.", 
       ("exe", name)
       ("inner", fc::except_str() )
-      ("PATH", fc::string(p!=nullptr?p:"") ) );
+      ("PATH", std::string(p!=nullptr?p:"") ) );
   }
   return fc::path();
 }
@@ -73,7 +73,7 @@ process::process()
 process::~process(){}
 
 iprocess& process::exec( const fc::path& exe, 
-                         std::vector<std::string> args, 
+                         std::vector<std::string> args,
                          const fc::path& work_dir, int opt  ) 
 {
 

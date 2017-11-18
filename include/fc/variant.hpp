@@ -138,10 +138,10 @@ namespace fc {
     void from_variant(const variant &var, fc::flat_map<K, T...> &vo);
 
     template<typename T>
-    void to_variant(const std::map<string, T> &var, variant &vo);
+    void to_variant(const std::map<std::string, T> &var, variant &vo);
 
     template<typename T>
-    void from_variant(const variant &var, std::map<string, T> &vo);
+    void from_variant(const variant &var, std::map<std::string, T> &vo);
 
     template<typename K, typename T>
     void to_variant(const std::map<K, T> &var, variant &vo);
@@ -220,7 +220,7 @@ namespace fc {
 
 
     /**
-     * @brief stores null, int64, uint64, double, bool, string, std::vector<variant>,
+     * @brief stores null, int64, uint64, double, bool, std::string, std::vector<variant>,
      *        and variant_object's.
      *
      * variant's allocate everything but strings, arrays, and objects on the
@@ -248,7 +248,7 @@ namespace fc {
         /// Constructs a null_type variant
         variant(nullptr_t);
 
-        /// @param str - UTF8 string
+        /// @param str - UTF8 std::string
         variant(const char *str);
 
         variant(char *str);
@@ -281,7 +281,7 @@ namespace fc {
 
         variant(blob val);
 
-        variant(fc::string val);
+        variant(std::string val);
 
         variant(variant_object);
 
@@ -314,7 +314,7 @@ namespace fc {
 
             virtual void handle(const bool &v) const = 0;
 
-            virtual void handle(const string &v) const = 0;
+            virtual void handle(const std::string &v) const = 0;
 
             virtual void handle(const variant_object &v) const = 0;
 
@@ -367,13 +367,13 @@ namespace fc {
 
         blob as_blob() const;
 
-        /** Convert's double, ints, bools, etc to a string
+        /** Convert's double, ints, bools, etc to a std::string
          * @throw if get_type() == array_type | get_type() == object_type 
          */
-        string as_string() const;
+        std::string as_string() const;
 
         /// @pre  get_type() == string_type
-        const string &get_string() const;
+        const std::string &get_string() const;
 
         /// @throw if get_type() != array_type | null_type
         variants &get_array();
@@ -453,7 +453,7 @@ namespace fc {
     typedef optional<variant> ovariant;
 
     /** @ingroup Serializable */
-    void from_variant(const variant &var, string &vo);
+    void from_variant(const variant &var, std::string &vo);
 
     /** @ingroup Serializable */
     void from_variant(const variant &var, variants &vo);

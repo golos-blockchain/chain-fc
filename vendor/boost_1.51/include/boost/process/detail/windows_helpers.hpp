@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 #include <cstddef>
-#include <string.h>
+#include <cstring>
 #include <windows.h>
 
 namespace boost {

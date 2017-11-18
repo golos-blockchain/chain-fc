@@ -22,7 +22,7 @@ inline unsigned int blowfish::F(unsigned int ui)
 	return ((m_auiS[0][Byte(ui>>24)] + m_auiS[1][Byte(ui>>16)]) ^ m_auiS[2][Byte(ui>>8)]) + m_auiS[3][Byte(ui)];
 }
 
-//Initialization with a fixed string which consists of the hexadecimal digits of PI (less the initial 3)
+//Initialization with a fixed std::string which consists of the hexadecimal digits of PI (less the initial 3)
 //P-array, 18 32-bit subkeys
 const unsigned int blowfish::scm_auiInitP[18] = {
 	0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344,

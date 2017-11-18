@@ -31,7 +31,7 @@
 	</Expand>
 </Type>
 
-<Type Name="fc::string">
+<Type Name="std::string">
 	<DisplayString>{my}</DisplayString>
 	<Expand>
 		<ExpandedItem>my</ExpandedItem>

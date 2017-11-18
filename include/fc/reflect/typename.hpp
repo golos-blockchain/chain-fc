@@ -113,9 +113,9 @@ namespace fc {
     };
 
     template<>
-    struct get_typename<string> {
+    struct get_typename<std::string> {
         static const char *name() {
-            return "string";
+            return "std::string";
         }
     };
 

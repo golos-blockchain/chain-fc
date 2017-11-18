@@ -2,9 +2,7 @@
 
 #include <fc/string.hpp>
 
-namespace fc 
-{
-
-  string zlib_compress(const string& in);
+namespace fc {
+    std::string zlib_compress(const std::string &in);
 
 } // namespace fc

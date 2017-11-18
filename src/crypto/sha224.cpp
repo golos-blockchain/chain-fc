@@ -2,7 +2,7 @@
 #include <fc/crypto/hmac.hpp>
 #include <fc/fwd_impl.hpp>
 #include <openssl/sha.h>
-#include <string.h>
+#include <cstring>
 #include <fc/crypto/sha224.hpp>
 #include <fc/variant.hpp>
 #include "_digest_common.hpp"
@@ -13,15 +13,15 @@ namespace fc {
         memset(_hash, 0, sizeof(_hash));
     }
 
-    sha224::sha224(const string &hex_str) {
+    sha224::sha224(const std::string &hex_str) {
         fc::from_hex(hex_str, (char *) _hash, sizeof(_hash));
     }
 
-    string sha224::str() const {
+    std::string sha224::str() const {
         return fc::to_hex((char *) _hash, sizeof(_hash));
     }
 
-    sha224::operator string() const {
+    sha224::operator std::string() const {
         return str();
     }
 
@@ -47,7 +47,7 @@ namespace fc {
         return e.result();
     }
 
-    sha224 sha224::hash(const string &s) {
+    sha224 sha224::hash(const std::string &s) {
         return hash(s.c_str(), s.size());
     }
 

@@ -118,9 +118,9 @@ namespace fc {
             return time_point();
         }
 
-        operator fc::string() const;
+        operator std::string() const;
 
-        static time_point from_iso_string(const fc::string &s);
+        static time_point from_iso_string(const std::string &s);
 
         const microseconds &time_since_epoch() const {
             return elapsed;
@@ -283,13 +283,13 @@ namespace fc {
             return time_point(t) - time_point(m);
         }
 
-        fc::string to_non_delimited_iso_string() const;
+        std::string to_non_delimited_iso_string() const;
 
-        fc::string to_iso_string() const;
+        std::string to_iso_string() const;
 
-        operator fc::string() const;
+        operator std::string() const;
 
-        static time_point_sec from_iso_string(const fc::string &s);
+        static time_point_sec from_iso_string(const std::string &s);
 
     private:
         uint32_t utc_seconds;
@@ -300,13 +300,13 @@ namespace fc {
     /** return a human-readable approximate time, relative to now()
      * e.g., "4 hours ago", "2 months ago", etc.
      */
-    string get_approximate_relative_time_string(const time_point_sec &event_time,
-                                                const time_point_sec &relative_to_time = fc::time_point::now(),
-                                                const std::string &ago = " ago");
+    std::string get_approximate_relative_time_string(const time_point_sec &event_time,
+                                                     const time_point_sec &relative_to_time = fc::time_point::now(),
+                                                     const std::string &ago = " ago");
 
-    string get_approximate_relative_time_string(const time_point &event_time,
-                                                const time_point &relative_to_time = fc::time_point::now(),
-                                                const std::string &ago = " ago");
+    std::string get_approximate_relative_time_string(const time_point &event_time,
+                                                     const time_point &relative_to_time = fc::time_point::now(),
+                                                     const std::string &ago = " ago");
 }
 
 #include <fc/reflect/reflect.hpp>

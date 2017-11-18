@@ -2,7 +2,7 @@
 #include <fc/crypto/hmac.hpp>
 #include <fc/fwd_impl.hpp>
 #include <openssl/sha.h>
-#include <string.h>
+#include <cstring>
 #include <cmath>
 #include <fc/crypto/sha256.hpp>
 #include <fc/variant.hpp>
@@ -21,15 +21,15 @@ namespace fc {
         memcpy(_hash, data, size);
     }
 
-    sha256::sha256(const string &hex_str) {
+    sha256::sha256(const std::string &hex_str) {
         fc::from_hex(hex_str, (char *) _hash, sizeof(_hash));
     }
 
-    string sha256::str() const {
+    std::string sha256::str() const {
         return fc::to_hex((char *) _hash, sizeof(_hash));
     }
 
-    sha256::operator string() const {
+    sha256::operator std::string() const {
         return str();
     }
 
@@ -55,7 +55,7 @@ namespace fc {
         return e.result();
     }
 
-    sha256 sha256::hash(const string &s) {
+    sha256 sha256::hash(const std::string &s) {
         return hash(s.c_str(), s.size());
     }
 

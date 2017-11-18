@@ -88,12 +88,12 @@ namespace fc {
    }
 
    void console_appender::log( const log_message& m ) {
-      //fc::string message = fc::format_string( m.get_format(), m.get_data() );
+      //std::string message = fc::format_string( m.get_format(), m.get_data() );
       //fc::variant lmsg(m);
 
       FILE* out = stream::std_error ? stderr : stdout;
 
-      //fc::string fmt_str = fc::format_string( cfg.format, mutable_variant_object(m.get_context())( "message", message)  );
+      //std::string fmt_str = fc::format_string( cfg.format, mutable_variant_object(m.get_context())( "message", message)  );
       std::stringstream file_line;
       file_line << m.get_context().get_file() << ":" << m.get_context().get_line_number() <<" ";
       ///////////////
@@ -117,7 +117,7 @@ namespace fc {
       }
       line << "] ";
 
-      fc::string message = fc::format_string( m.get_format(), m.get_data() );
+      std::string message = fc::format_string( m.get_format(), m.get_data() );
       line << message;//.c_str();
 
       fc::unique_lock<boost::mutex> lock(log_mutex());

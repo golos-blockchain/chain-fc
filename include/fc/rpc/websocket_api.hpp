@@ -1,40 +1,34 @@
 #pragma once
+
 #include <fc/rpc/api_connection.hpp>
 #include <fc/rpc/state.hpp>
 #include <fc/network/http/websocket.hpp>
 #include <fc/io/json.hpp>
 #include <fc/reflect/variant.hpp>
 
-namespace fc { namespace rpc {
+namespace fc {
+    namespace rpc {
 
-   class websocket_api_connection : public api_connection
-   {
-      public:
-         websocket_api_connection( fc::http::websocket_connection& c );
-         ~websocket_api_connection();
+        class websocket_api_connection : public api_connection {
+        public:
+            websocket_api_connection(fc::http::websocket_connection &c);
 
-         virtual variant send_call(
-            api_id_type api_id,
-            string method_name,
-            variants args = variants() ) override;
-         virtual variant send_callback(
-            uint64_t callback_id,
-            variants args = variants() ) override;
-         virtual void send_notice(
-            uint64_t callback_id,
-            variants args = variants() ) override;
+            ~websocket_api_connection();
 
-      protected:
-         std::string on_message(
-            const std::string& message,
-            bool send_message = true );
+            virtual variant send_call(api_id_type api_id, std::string method_name, variants args = variants()) override;
 
-       std::string on_message_impl(
-               const std::string& message,
-               bool send_message = true );
+            virtual variant send_callback(uint64_t callback_id, variants args = variants()) override;
 
-         fc::http::websocket_connection&  _connection;
-         fc::rpc::state                   _rpc_state;
-   };
+            virtual void send_notice(uint64_t callback_id, variants args = variants()) override;
 
-} } // namespace fc::rpc
+        protected:
+            std::string on_message(const std::string &message, bool send_message = true);
+
+            std::string on_message_impl(const std::string &message, bool send_message = true);
+
+            fc::http::websocket_connection &_connection;
+            fc::rpc::state _rpc_state;
+        };
+
+    }
+} // namespace fc::rpc

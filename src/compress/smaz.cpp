@@ -1,6 +1,6 @@
 #include <string>
 #include <sstream>
-#include <string.h>
+#include <cstring>
 #include <fc/exception/exception.hpp>
 namespace fc {
 
@@ -176,7 +176,7 @@ void smaz_decompress(const char *in, uint32_t inlen, std::stringstream& ss ) {
             c += 2;
             inlen -= 2;
         } else if (*c == 255) {
-            /* Verbatim string */
+            /* Verbatim std::string */
             int len = (*(c+1))+1;
             //if (outlen < len) return _outlen+1;
             ss.write( (const char*)(c+2),len );

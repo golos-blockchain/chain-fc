@@ -4,7 +4,8 @@
 #include <fc/vector.hpp>
 #else
 namespace fc {
-  template<typename T> class vector;
+    template<typename T>
+    class vector;
 };
 #endif
 

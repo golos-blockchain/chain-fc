@@ -11,13 +11,13 @@ namespace fc {
     public:
         sha256();
 
-        explicit sha256(const string &hex_str);
+        explicit sha256(const std::string &hex_str);
 
         explicit sha256(const char *data, size_t size);
 
-        string str() const;
+        std::string str() const;
 
-        operator string() const;
+        operator std::string() const;
 
         char *data() const;
 
@@ -27,7 +27,7 @@ namespace fc {
 
         static sha256 hash(const char *d, uint32_t dlen);
 
-        static sha256 hash(const string &);
+        static sha256 hash(const std::string &);
 
         static sha256 hash(const sha256 &);
 

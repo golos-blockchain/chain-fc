@@ -2,7 +2,7 @@
 #include <fc/io/sstream.hpp>
 #include <fc/thread/thread.hpp>
 #include <iostream>
-#include <string.h>
+#include <cstring>
 //#include <fc/log.hpp>
 #include <fc/thread/mutex.hpp>
 #include <fc/thread/scoped_lock.hpp>
@@ -76,7 +76,7 @@ namespace fc {
 
   fc::thread& cin_thread() { static fc::thread i("cin"); return i; }
 
-  fc::istream& getline( fc::istream& i, fc::string& s, char delim  ) {
+  fc::istream& getline( fc::istream& i, std::string& s, char delim  ) {
     fc::stringstream ss; 
     char c;
     i.read( &c, 1 );
@@ -195,7 +195,7 @@ namespace fc {
      return o;
   }
 #ifdef USE_FC_STRING
-  ostream& operator<<( ostream& o, const fc::string& v )
+  ostream& operator<<( ostream& o, const std::string& v )
   {
      o.write( v.c_str(), v.size() );
      return o;
@@ -267,7 +267,7 @@ namespace fc {
   }
 
 #ifdef USE_FC_STRING
-  istream& operator>>( istream& o, fc::string& v )
+  istream& operator>>( istream& o, std::string& v )
   {
      assert(false && "not implemented");
      return o;

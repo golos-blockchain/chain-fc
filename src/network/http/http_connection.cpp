@@ -42,7 +42,7 @@ public:
             std::vector<char> line(1024 * 8);
             int s = read_until(line.data(), line.data() + line.size(), ' '); // HTTP/1.1
             s = read_until(line.data(), line.data() + line.size(), ' '); // CODE
-            rep.status = static_cast<int>(to_int64(fc::string(line.data())));
+            rep.status = static_cast<int>(to_int64(std::string(line.data())));
             s = read_until(line.data(), line.data() + line.size(), '\n'); // DESCRIPTION
 
             while ((s = read_until(line.data(), line.data() + line.size(), '\n')) > 1) {
@@ -51,17 +51,17 @@ public:
                 while (*end != ':') {
                     ++end;
                 }
-                h.key = fc::string(line.data(), end);
+                h.key = std::string(line.data(), end);
                 ++end; // skip ':'
                 ++end; // skip space
                 char *skey = end;
                 while (*end != '\r') {
                     ++end;
                 }
-                h.val = fc::string(skey, end);
+                h.val = std::string(skey, end);
                 rep.headers.push_back(h);
                 if (boost::iequals(h.key, "Content-Length")) {
-                    rep.body.resize(static_cast<size_t>(to_uint64(fc::string(h.val))));
+                    rep.body.resize(static_cast<size_t>(to_uint64(std::string(h.val))));
                 }
             }
             if (rep.body.size()) {
@@ -94,7 +94,7 @@ namespace fc {
             my->sock.connect_to(my->ep = ep);
         }
 
-        http::reply connection::request(const fc::string &method, const fc::string &url, const fc::string &body,
+        http::reply connection::request(const std::string &method, const std::string &url, const std::string &body,
                                         const headers &he) {
 
             fc::url parsed_url(url);
@@ -114,7 +114,7 @@ namespace fc {
                     req << "Content-Length: " << body.size() << "\r\n";
                 }
                 req << "\r\n";
-                fc::string head = req.str();
+                std::string head = req.str();
 
                 my->sock.write(head.c_str(), head.size());
                 //  fc::cerr.write( head.c_str() );
@@ -154,19 +154,19 @@ namespace fc {
                 while (*end != ':') {
                     ++end;
                 }
-                h.key = fc::string(line.data(), end);
+                h.key = std::string(line.data(), end);
                 ++end; // skip ':'
                 ++end; // skip space
                 char *skey = end;
                 while (*end != '\r') {
                     ++end;
                 }
-                h.val = fc::string(skey, end);
+                h.val = std::string(skey, end);
                 req.headers.push_back(h);
                 if (boost::iequals(h.key, "Content-Length")) {
-                    auto s = static_cast<size_t>(to_uint64(fc::string(h.val)));
+                    auto s = static_cast<size_t>(to_uint64(std::string(h.val)));
                     FC_ASSERT(s < 1024 * 1024);
-                    req.body.resize(static_cast<size_t>(to_uint64(fc::string(h.val))));
+                    req.body.resize(static_cast<size_t>(to_uint64(std::string(h.val))));
                 }
                 if (boost::iequals(h.key, "Host")) {
                     req.domain = h.val;
@@ -181,16 +181,16 @@ namespace fc {
             return req;
         }
 
-        fc::string request::get_header(const fc::string &key) const {
+        std::string request::get_header(const std::string &key) const {
             for (auto itr = headers.begin(); itr != headers.end(); ++itr) {
                 if (boost::iequals(itr->key, key)) {
                     return itr->val;
                 }
             }
-            return fc::string();
+            return std::string();
         }
 
-        std::vector<header> parse_urlencoded_params(const fc::string &f) {
+        std::vector<header> parse_urlencoded_params(const std::string &f) {
             int num_args = 0;
             for (size_t i = 0; i < f.size(); ++i) {
                 if (f[i] == '=') {

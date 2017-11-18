@@ -31,7 +31,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <cstring>
 
 #define TEST_BASExx(base,str,expected) \
     printf( "TEST_BASE%s('%s')='%s'", #base, str, expected ); \

@@ -21,11 +21,11 @@ namespace fc {
      */
     class logger {
     public:
-        static logger get(const fc::string &name = "default");
+        static logger get(const std::string &name = "default");
 
         logger();
 
-        logger(const string &name, const logger &parent = nullptr);
+        logger(const std::string &name, const logger &parent = nullptr);
 
         logger(std::nullptr_t);
 
@@ -51,9 +51,9 @@ namespace fc {
 
         logger get_parent() const;
 
-        void set_name(const fc::string &n);
+        void set_name(const std::string &n);
 
-        const fc::string &name() const;
+        const std::string &name() const;
 
         void add_appender(const fc::shared_ptr<appender> &a);
 

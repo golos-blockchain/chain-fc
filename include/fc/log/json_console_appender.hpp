@@ -37,7 +37,7 @@ namespace fc {
                     stream(json_console_appender::j_stream::std_error), flush(true) {
             }
 
-            fc::string format;
+            std::string format;
             json_console_appender::j_stream::type stream;
             std::vector<j_level_color> level_colors;
             bool flush;

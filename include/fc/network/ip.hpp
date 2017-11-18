@@ -13,11 +13,11 @@ namespace fc {
         public:
             address(uint32_t _ip = 0);
 
-            address(const fc::string &s);
+            address(const std::string &s);
 
-            address &operator=(const fc::string &s);
+            address &operator=(const std::string &s);
 
-            operator fc::string() const;
+            operator std::string() const;
 
             operator uint32_t() const;
 
@@ -55,10 +55,10 @@ namespace fc {
             endpoint(const address &i, uint16_t p = 0);
 
             /** Converts "IP:PORT" to an endpoint */
-            static endpoint from_string(const string &s);
+            static endpoint from_string(const std::string &s);
 
             /** returns "IP:PORT" */
-            operator string() const;
+            operator std::string() const;
 
             void set_port(uint16_t p) {
                 _port = p;

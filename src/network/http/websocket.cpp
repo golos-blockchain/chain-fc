@@ -285,7 +285,7 @@ namespace fc {
 
             class websocket_tls_server_impl {
             public:
-                websocket_tls_server_impl(const leaky_bucket_rules& limit,const string &server_pem, const string &ssl_password) : _server_thread(fc::thread::current()) {
+                websocket_tls_server_impl(const leaky_bucket_rules& limit,const std::string &server_pem, const std::string &ssl_password) : _server_thread(fc::thread::current()) {
                     //if( server_pem.size() )
                     {
                         _server.set_tls_init_handler([=](websocketpp::connection_hdl hdl) -> context_ptr {
@@ -512,7 +512,7 @@ namespace fc {
                     // are buggy and are not standards compliant in this situation.  Also, keep in mind this is the opinion of a single forum
                     // poster and might be wrong.
                     //
-                    // To be safe, the following line explicitly creates a non-reference string which is captured by value, which should have the
+                    // To be safe, the following line explicitly creates a non-reference std::string which is captured by value, which should have the
                     // correct behavior on all compilers.
                     //
                     // [1] http://www.cplusplus.com/forum/general/142165/
@@ -601,11 +601,11 @@ namespace fc {
         }
 
 
-        websocket_tls_server::websocket_tls_server(const leaky_bucket_rules& limit,const string &server_pem, const string &ssl_password)
+        websocket_tls_server::websocket_tls_server(const leaky_bucket_rules& limit,const std::string &server_pem, const std::string &ssl_password)
                 : my(new detail::websocket_tls_server_impl(limit,server_pem, ssl_password)) {}
 
 
-        websocket_tls_server::websocket_tls_server(const string &server_pem, const string &ssl_password)
+        websocket_tls_server::websocket_tls_server(const std::string &server_pem, const std::string &ssl_password)
                 : my(new detail::websocket_tls_server_impl(leaky_bucket_rules(),server_pem, ssl_password)) {}
 
         websocket_tls_server::~websocket_tls_server() {}

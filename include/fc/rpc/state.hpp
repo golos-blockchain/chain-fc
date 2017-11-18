@@ -7,7 +7,7 @@
 namespace fc {
     namespace rpc {
         struct request {
-            optional <uint64_t> id;
+            optional<uint64_t> id;
             std::string method;
             variants params;
         };
@@ -15,7 +15,7 @@ namespace fc {
         struct error_object {
             int64_t code;
             std::string message;
-            optional <variant> data;
+            optional<variant> data;
         };
 
         struct response {
@@ -29,44 +29,41 @@ namespace fc {
             }
 
             int64_t id = 0;
-            optional <fc::variant> result;
-            optional <error_object> error;
+            optional<fc::variant> result;
+            optional<error_object> error;
         };
 
         class state {
         public:
-            typedef std::function< variant(const variants &)
+            typedef std::function<variant(const variants &)
 
-            >
-            method;
+            > method;
 
             ~state();
 
-            void add_method(const fc::string &name, method m);
+            void add_method(const std::string &name, method m);
 
-            void remove_method(const fc::string &name);
+            void remove_method(const std::string &name);
 
-            variant local_call(const string &method_name, const variants &args);
+            variant local_call(const std::string &method_name, const variants &args);
 
             void handle_reply(const response &response);
 
-            request start_remote_call(const string &method_name, variants args);
+            request start_remote_call(const std::string &method_name, variants args);
 
             variant wait_for_response(uint64_t request_id);
 
             void close();
 
-            void on_unhandled(const std::function<variant(const string &, const variants &
+            void on_unhandled(const std::function<variant(const std::string &, const variants &
 
-            )>& unhandled );
+            )> &unhandled);
 
         private:
             uint64_t _next_id = 1;
             std::unordered_map<uint64_t, fc::promise<variant>::ptr> _awaiting;
             std::unordered_map<std::string, method> _methods;
-            std::function<variant(const string &, const variants
-            &)>
-            _unhandled;
+            std::function<variant(const std::string &, const variants &)> _unhandled;
         };
     }
 }  // namespace  fc::rpc

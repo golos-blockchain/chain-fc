@@ -31,7 +31,7 @@ namespace fc {
 
 inline const std::string& base64_chars()
 {
-    static const std::string m_base64_chars = 
+    static const std::string m_base64_chars =
                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                  "abcdefghijklmnopqrstuvwxyz"
                  "0123456789+/";

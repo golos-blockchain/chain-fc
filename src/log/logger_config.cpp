@@ -17,7 +17,7 @@ namespace fc {
 
     extern std::unordered_map<std::string, appender::ptr> &get_appender_map();
 
-    logger_config &logger_config::add_appender(const string &s) {
+    logger_config &logger_config::add_appender(const std::string &s) {
         appenders.push_back(s);
         return *this;
     }

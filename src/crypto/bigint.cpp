@@ -197,7 +197,7 @@ namespace fc {
         BN_copy( n, a.n );
         return *this;
       }
-      bigint::operator fc::string()const {
+      bigint::operator std::string()const {
         return BN_bn2dec(n);
       }
 
@@ -207,14 +207,14 @@ namespace fc {
         return to;
       }
 
-  /** encodes the big int as base64 string, or a number */
+  /** encodes the big int as base64 std::string, or a number */
   void to_variant( const bigint& bi, variant& v )
   {
     std::vector<char> ve = bi;
     v = fc::variant(base64_encode((unsigned char*)ve.data(),ve.size()));
   }
 
-  /** decodes the big int as base64 string, or a number */
+  /** decodes the big int as base64 std::string, or a number */
   void from_variant( const variant& v, bigint& bi )
   {
     if( v.is_numeric() ) bi = bigint( static_cast<unsigned long>(v.as_uint64()) );

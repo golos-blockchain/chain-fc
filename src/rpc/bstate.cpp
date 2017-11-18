@@ -8,15 +8,15 @@ namespace fc {
             close();
         }
 
-        void bstate::add_method(const fc::string &name, method m) {
+        void bstate::add_method(const std::string &name, method m) {
             _methods.emplace(std::pair<std::string, method>(name, fc::move(m)));
         }
 
-        void bstate::remove_method(const fc::string &name) {
+        void bstate::remove_method(const std::string &name) {
             _methods.erase(name);
         }
 
-        result_type bstate::local_call(const string &method_name, const params_type &args) {
+        result_type bstate::local_call(const std::string &method_name, const params_type &args) {
             auto method_itr = _methods.find(method_name);
             if (method_itr == _methods.end() && _unhandled) {
                 return _unhandled(method_name, args);
@@ -41,7 +41,7 @@ namespace fc {
             _awaiting.erase(await);
         }
 
-        brequest bstate::start_remote_call(const string &method_name, params_type args) {
+        brequest bstate::start_remote_call(const std::string &method_name, params_type args) {
             brequest brequest{_next_id++, method_name, std::move(args)};
             _awaiting[*brequest.id] = fc::promise<result_type>::ptr(
                     new fc::promise<result_type>("json_connection::async_call"));
@@ -61,7 +61,7 @@ namespace fc {
             _awaiting.clear();
         }
 
-        void bstate::on_unhandled(const std::function<result_type(const string &, const params_type &)> &unhandled) {
+        void bstate::on_unhandled(const std::function<result_type(const std::string &, const params_type &)> &unhandled) {
             _unhandled = unhandled;
         }
 

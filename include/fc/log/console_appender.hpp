@@ -32,7 +32,7 @@ namespace fc {
                     stream(console_appender::stream::std_error), flush(true) {
             }
 
-            fc::string format;
+            std::string format;
             console_appender::stream::type stream;
             std::vector<level_color> level_colors;
             bool flush;

@@ -23,7 +23,8 @@ namespace fc {
 
         class websocket_connection {
         public:
-            websocket_connection(const leaky_bucket_rules& rules):rules(rules) {}
+            websocket_connection(const leaky_bucket_rules &rules) : rules(rules) {
+            }
 
             websocket_connection() = default;
 
@@ -31,19 +32,30 @@ namespace fc {
 
             virtual void send_message(const std::string &message) = 0;
 
-            virtual void close(int64_t code, const std::string &reason) {};
+            virtual void close(int64_t code, const std::string &reason) {
+            };
 
             void on_message(const std::string &message);
 
-            string on_http(const std::string &message) { return _on_http(message); }
+            std::string on_http(const std::string &message) {
+                return _on_http(message);
+            }
 
-            void on_message_handler(const std::function<void(const std::string &)> &h) { _on_message = h; }
+            void on_message_handler(const std::function<void(const std::string &)> &h) {
+                _on_message = h;
+            }
 
-            void on_http_handler(const std::function<std::string(const std::string &)> &h) { _on_http = h; }
+            void on_http_handler(const std::function<std::string(const std::string &)> &h) {
+                _on_http = h;
+            }
 
-            void set_session_data(fc::any d) { _session_data = std::move(d); }
+            void set_session_data(fc::any d) {
+                _session_data = std::move(d);
+            }
 
-            fc::any &get_session_data() { return _session_data; }
+            fc::any &get_session_data() {
+                return _session_data;
+            }
 
             fc::signal<void()> closed;
 
@@ -51,7 +63,7 @@ namespace fc {
         private:
             fc::any _session_data;
             std::function<void(const std::string &)> _on_message;
-            std::function<string(const std::string &)> _on_http;
+            std::function<std::string(const std::string &)> _on_http;
         };
 
         typedef std::shared_ptr<websocket_connection> websocket_connection_ptr;
@@ -60,7 +72,8 @@ namespace fc {
 
         class websocket_server {
         public:
-            websocket_server(const leaky_bucket_rules& limit);
+            websocket_server(const leaky_bucket_rules &limit);
+
             websocket_server();
 
             ~websocket_server();
@@ -82,16 +95,11 @@ namespace fc {
 
         class websocket_tls_server {
         public:
-            websocket_tls_server(
-                    const std::string &server_pem = std::string(),
-                    const std::string &ssl_password = std::string()
-            );
+            websocket_tls_server(const std::string &server_pem = std::string(),
+                                 const std::string &ssl_password = std::string());
 
-            websocket_tls_server(
-                    const leaky_bucket_rules& rules,
-                    const std::string &server_pem = std::string(),
-                    const std::string &ssl_password = std::string()
-            );
+            websocket_tls_server(const leaky_bucket_rules &rules, const std::string &server_pem = std::string(),
+                                 const std::string &ssl_password = std::string());
 
             ~websocket_tls_server();
 

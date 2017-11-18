@@ -36,7 +36,7 @@ namespace fc {
     public_key::public_key( const bytes& d )
     :my( std::make_shared<detail::pke_impl>() )
     {
-       string pem = "-----BEGIN RSA PUBLIC KEY-----\n";
+       std::string pem = "-----BEGIN RSA PUBLIC KEY-----\n";
        auto b64 = fc::base64_encode( (const unsigned char*)d.data(), d.size() );
        for( size_t i = 0; i < b64.size(); i += 64 )
            pem += b64.substr( i, 64 ) + "\n";
@@ -97,7 +97,7 @@ namespace fc {
           out.resize(rtn);
           return out;
        }
-       FC_THROW_EXCEPTION( exception, "openssl: ${message}", ("message",fc::string(ERR_error_string( ERR_get_error(),NULL))) );
+       FC_THROW_EXCEPTION( exception, "openssl: ${message}", ("message",std::string(ERR_error_string( ERR_get_error(),NULL))) );
     }
 
     bytes public_key::encrypt( const bytes& in )const
@@ -113,7 +113,7 @@ namespace fc {
           out.resize(rtn);
           return out;
        }
-       FC_THROW_EXCEPTION( exception, "openssl: ${message}", ("message",fc::string(ERR_error_string( ERR_get_error(),NULL))) );
+       FC_THROW_EXCEPTION( exception, "openssl: ${message}", ("message",std::string(ERR_error_string( ERR_get_error(),NULL))) );
     }
     bytes public_key::decrypt( const bytes& in )const
     {
@@ -127,7 +127,7 @@ namespace fc {
           out.resize(rtn);
           return out;
        }
-       FC_THROW_EXCEPTION( exception, "openssl: ${message}", ("message",fc::string(ERR_error_string( ERR_get_error(),NULL))) );
+       FC_THROW_EXCEPTION( exception, "openssl: ${message}", ("message",std::string(ERR_error_string( ERR_get_error(),NULL))) );
     }
 
     bytes public_key::serialize()const
@@ -140,14 +140,14 @@ namespace fc {
        if( e != 1 )
        {
            BIO_free(mem);
-           FC_THROW_EXCEPTION( exception, "openssl: ${message}", ("message",fc::string(ERR_error_string( ERR_get_error(),NULL))) );
+           FC_THROW_EXCEPTION( exception, "openssl: ${message}", ("message",std::string(ERR_error_string( ERR_get_error(),NULL))) );
        }
        char* dat;
        uint32_t l = BIO_get_mem_data( mem, &dat );
 
-       fc::stringstream ss( string( dat, l ) );
+       fc::stringstream ss( std::string( dat, l ) );
        fc::stringstream key;
-       fc::string tmp;
+       std::string tmp;
        fc::getline( ss, tmp );
        fc::getline( ss, tmp );
        while( tmp.size() && tmp[0] != '-' )
@@ -170,7 +170,7 @@ namespace fc {
     :my( std::make_shared<detail::pke_impl>() )
     {
       
-       string pem = "-----BEGIN RSA PRIVATE KEY-----\n";
+       std::string pem = "-----BEGIN RSA PRIVATE KEY-----\n";
        auto b64 = fc::base64_encode( (const unsigned char*)d.data(), d.size() );
        for( size_t i = 0; i < b64.size(); i += 64 )
            pem += b64.substr( i, 64 ) + "\n";
@@ -210,7 +210,7 @@ namespace fc {
        if( 1 != RSA_sign( NID_sha1, (uint8_t*)&digest,
                           20, (unsigned char*)&sig, &slen, my->rsa ) )
        {
-           FC_THROW_EXCEPTION( exception, "rsa sign failed with ${message}", ("message",fc::string(ERR_error_string( ERR_get_error(),NULL))) );
+           FC_THROW_EXCEPTION( exception, "rsa sign failed with ${message}", ("message",std::string(ERR_error_string( ERR_get_error(),NULL))) );
        }
     }
 
@@ -224,7 +224,7 @@ namespace fc {
        if( 1 != RSA_sign( NID_sha1, (uint8_t*)digest.data(),
                           20, (unsigned char*)sig.data(), &slen, my->rsa ) )
        {
-           FC_THROW_EXCEPTION( exception, "rsa sign failed with ${message}", ("message",fc::string(ERR_error_string( ERR_get_error(),NULL))) );
+           FC_THROW_EXCEPTION( exception, "rsa sign failed with ${message}", ("message",std::string(ERR_error_string( ERR_get_error(),NULL))) );
        }
        return sig;
     }
@@ -238,7 +238,7 @@ namespace fc {
        if( 1 != RSA_sign( NID_sha256, (uint8_t*)digest.data(),
                           32, (unsigned char*)sig.data(), &slen, my->rsa ) )
        {
-          FC_THROW_EXCEPTION( exception, "rsa sign failed with ${message}", ("message",fc::string(ERR_error_string( ERR_get_error(),NULL))) );
+          FC_THROW_EXCEPTION( exception, "rsa sign failed with ${message}", ("message",std::string(ERR_error_string( ERR_get_error(),NULL))) );
        }
        return sig;
     }
@@ -302,15 +302,15 @@ namespace fc {
        if( e != 1 )
        {
            BIO_free(mem);
-           FC_THROW_EXCEPTION( exception, "Error writing private key, ${message}", ("message",fc::string(ERR_error_string( ERR_get_error(),NULL))) );
+           FC_THROW_EXCEPTION( exception, "Error writing private key, ${message}", ("message",std::string(ERR_error_string( ERR_get_error(),NULL))) );
        }
        char* dat;
        uint32_t l = BIO_get_mem_data( mem, &dat );
     //   return bytes( dat, dat + l );
 
-       stringstream ss( string( dat, l ) );
+       stringstream ss( std::string( dat, l ) );
        stringstream key;
-       string tmp;
+       std::string tmp;
        fc::getline( ss, tmp );
        fc::getline( ss, tmp );
 
@@ -337,26 +337,26 @@ namespace fc {
        pub.my->rsa = RSA_generate_key( 2048, 65537, NULL, NULL );
     }
 
-  /** encodes the big int as base64 string, or a number */
+  /** encodes the big int as base64 std::string, or a number */
   void to_variant( const public_key& bi, variant& v )
   {
     v = bi.serialize();
   }
 
-  /** decodes the big int as base64 string, or a number */
+  /** decodes the big int as base64 std::string, or a number */
   void from_variant( const variant& v, public_key& bi )
   {
     bi = public_key( v.as<std::vector<char> >() ); 
   }
 
 
-  /** encodes the big int as base64 string, or a number */
+  /** encodes the big int as base64 std::string, or a number */
   void to_variant( const private_key& bi, variant& v )
   {
     v = bi.serialize();
   }
 
-  /** decodes the big int as base64 string, or a number */
+  /** decodes the big int as base64 std::string, or a number */
   void from_variant( const variant& v, private_key& bi )
   {
     bi = private_key( v.as<std::vector<char> >() ); 

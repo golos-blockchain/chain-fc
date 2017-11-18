@@ -229,7 +229,7 @@ namespace fc { namespace ecc {
        return private_key( k );
     }
 
-    static fc::string _to_base58( const extended_key_data& key )
+    static std::string _to_base58( const extended_key_data& key )
     {
         char *buffer = (char*)alloca(key.size() + 4);
         memcpy( buffer, key.begin(), key.size() );
@@ -238,7 +238,7 @@ namespace fc { namespace ecc {
         return fc::to_base58( buffer, sizeof(buffer) );
     }
 
-    static void _parse_extended_data( unsigned char* buffer, fc::string base58 )
+    static void _parse_extended_data( unsigned char* buffer, std::string base58 )
     {
         memset( buffer, 0, 78 );
         std::vector<char> decoded = fc::from_base58( base58 );
@@ -275,12 +275,12 @@ namespace fc { namespace ecc {
        return from_base58( _to_base58( data ) );
     }
 
-    fc::string extended_public_key::str() const
+    std::string extended_public_key::str() const
     {
         return _to_base58( serialize_extended() );
     }
 
-    extended_public_key extended_public_key::from_base58( const fc::string& base58 )
+    extended_public_key extended_public_key::from_base58( const std::string& base58 )
     {
         unsigned char buffer[78];
         unsigned char* ptr = buffer;
@@ -351,12 +351,12 @@ namespace fc { namespace ecc {
     private_key extended_private_key::generate_c(int i) const { return derive_hardened_child(4*i + 2); }
     private_key extended_private_key::generate_d(int i) const { return derive_hardened_child(4*i + 3); }
 
-    fc::string extended_private_key::str() const
+    std::string extended_private_key::str() const
     {
         return _to_base58( serialize_extended() );
     }
 
-    extended_private_key extended_private_key::from_base58( const fc::string& base58 )
+    extended_private_key extended_private_key::from_base58( const std::string& base58 )
     {
         unsigned char buffer[78];
         unsigned char* ptr = buffer;
@@ -373,7 +373,7 @@ namespace fc { namespace ecc {
         return extended_private_key( private_key::regenerate(key), chain, cn, fp, d );
     }
 
-    extended_private_key extended_private_key::generate_master( const fc::string& seed )
+    extended_private_key extended_private_key::generate_master( const std::string& seed )
     {
         return generate_master( seed.c_str(), seed.size() );
     }

@@ -2,7 +2,7 @@
 #include <fc/crypto/bigint.hpp>
 #include <fc/exception/exception.hpp>
 #include <sstream>
-#include <stdint.h>
+#include <cstdint>
 
 namespace fc {
     uint64_t real128::to_uint64() const {
@@ -63,7 +63,7 @@ namespace fc {
             }
             *this = real128(int_part);
         } else {
-            // if the string doesn't look like "123.45" or ".45", this code isn't designed to parse it correctly
+            // if the std::string doesn't look like "123.45" or ".45", this code isn't designed to parse it correctly
             // in particular, we don't try to handle leading whitespace or '+'/'-' indicators at the beginning
             assert(*c == '.');
             fixed = fc::uint128();

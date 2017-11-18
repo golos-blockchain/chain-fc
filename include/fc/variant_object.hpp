@@ -27,7 +27,7 @@ namespace fc {
         public:
             entry();
 
-            entry(string k, variant v);
+            entry(std::string k, variant v);
 
             entry(entry &&e);
 
@@ -37,7 +37,7 @@ namespace fc {
 
             entry &operator=(entry &&);
 
-            const string &key() const;
+            const std::string &key() const;
 
             const variant &value() const;
 
@@ -46,7 +46,7 @@ namespace fc {
             variant &value();
 
         private:
-            string _key;
+            std::string _key;
             variant _value;
         };
 
@@ -63,11 +63,11 @@ namespace fc {
 
         iterator end() const;
 
-        iterator find(const string &key) const;
+        iterator find(const std::string &key) const;
 
         iterator find(const char *key) const;
 
-        const variant &operator[](const string &key) const;
+        const variant &operator[](const std::string &key) const;
 
         const variant &operator[](const char *key) const;
 
@@ -81,10 +81,10 @@ namespace fc {
         variant_object();
 
         /** initializes the first key/value pair in the object */
-        variant_object(string key, variant val);
+        variant_object(std::string key, variant val);
 
         template<typename T>
-        variant_object(const map<string, T> &values)
+        variant_object(const map<std::string, T> &values)
                 :_key_value(new std::vector<entry>()) {
             _key_value->reserve(values.size());
             for (const auto &item : values) {
@@ -93,7 +93,7 @@ namespace fc {
         }
 
         template<typename T>
-        variant_object(string key, T &&val)
+        variant_object(std::string key, T &&val)
                 :_key_value(std::make_shared<std::vector<entry> >()) {
             *this = variant_object(std::move(key), variant(forward<T>(val)));
         }
@@ -157,18 +157,18 @@ namespace fc {
 
         iterator end() const;
 
-        iterator find(const string &key) const;
+        iterator find(const std::string &key) const;
 
         iterator find(const char *key) const;
 
-        const variant &operator[](const string &key) const;
+        const variant &operator[](const std::string &key) const;
 
         const variant &operator[](const char *key) const;
 
         size_t size() const;
 
         ///@}
-        variant &operator[](const string &key);
+        variant &operator[](const std::string &key);
 
         variant &operator[](const char *key);
 
@@ -185,19 +185,19 @@ namespace fc {
 
         iterator end();
 
-        void erase(const string &key);
+        void erase(const std::string &key);
 
         /**
            *
            * @return end() if key is not found
            */
-        iterator find(const string &key);
+        iterator find(const std::string &key);
 
         iterator find(const char *key);
 
 
         /** replaces the value at \a key with \a var or insert's \a key if not found */
-        mutable_variant_object &set(string key, variant var);
+        mutable_variant_object &set(std::string key, variant var);
         /** Appends \a key and \a var without checking for duplicates, designed to
            *  simplify construction of dictionaries using (key,val)(key2,val2) syntax
            */
@@ -213,10 +213,10 @@ namespace fc {
         *
         *  @return *this;
         */
-        mutable_variant_object &operator()(string key, variant var);
+        mutable_variant_object &operator()(std::string key, variant var);
 
         template<typename T>
-        mutable_variant_object &operator()(string key, T &&var) {
+        mutable_variant_object &operator()(std::string key, T &&var) {
             set(std::move(key), variant(fc::forward<T>(var)));
             return *this;
         }
@@ -242,7 +242,7 @@ namespace fc {
         mutable_variant_object();
 
         template<typename T>
-        mutable_variant_object(const map<string, T> &values)
+        mutable_variant_object(const map<std::string, T> &values)
                 :_key_value(new std::vector<entry>()) {
             _key_value->reserve(values.size());
             for (const auto &item : values) {
@@ -251,10 +251,10 @@ namespace fc {
         }
 
         /** initializes the first key/value pair in the object */
-        mutable_variant_object(string key, variant val);
+        mutable_variant_object(std::string key, variant val);
 
         template<typename T>
-        mutable_variant_object(string key, T &&val)
+        mutable_variant_object(std::string key, T &&val)
                 :_key_value(new std::vector<entry>()) {
             set(std::move(key), variant(forward<T>(val)));
         }
@@ -285,12 +285,12 @@ namespace fc {
     void from_variant(const variant &var, mutable_variant_object &vo);
 
     template<typename T>
-    void to_variant(const std::map<string, T> &var, variant &vo) {
+    void to_variant(const std::map<std::string, T> &var, variant &vo) {
         vo = variant_object(var);
     }
 
     template<typename T>
-    void from_variant(const variant &var, std::map<string, T> &vo) {
+    void from_variant(const variant &var, std::map<std::string, T> &vo) {
         const auto &obj = var.get_object();
         vo.clear();
         for (auto itr = obj.begin(); itr != obj.end(); ++itr) {
