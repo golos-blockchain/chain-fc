@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fc/fwd.hpp>
+#include <fc/fixed_string.hpp>
 #include <fc/string.hpp>
 
 namespace fc {
@@ -24,6 +25,8 @@ namespace fc {
         static sha512 hash(const char *d, uint32_t dlen);
 
         static sha512 hash(const std::string &);
+
+        static sha512 hash(const fc::fixed_string<> &);
 
         template<typename T>
         static sha512 hash(const T &t) {

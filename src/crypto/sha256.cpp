@@ -59,6 +59,10 @@ namespace fc {
         return hash(s.c_str(), s.size());
     }
 
+    sha256 sha256::hash(const fc::fixed_string<> &s) {
+        return hash(fc::to_string(s).c_str(), s.size());
+    }
+
     sha256 sha256::hash(const sha256 &s) {
         return hash(s.data(), sizeof(s._hash));
     }

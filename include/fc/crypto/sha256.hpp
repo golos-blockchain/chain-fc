@@ -2,6 +2,7 @@
 
 #include <fc/fwd.hpp>
 #include <fc/string.hpp>
+#include <fc/fixed_string.hpp>
 #include <fc/platform_independence.hpp>
 #include <fc/io/raw_fwd.hpp>
 
@@ -28,6 +29,8 @@ namespace fc {
         static sha256 hash(const char *d, uint32_t dlen);
 
         static sha256 hash(const std::string &);
+
+        static sha256 hash(const fc::fixed_string<> &);
 
         static sha256 hash(const sha256 &);
 
