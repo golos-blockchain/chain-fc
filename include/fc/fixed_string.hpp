@@ -1,10 +1,12 @@
 #pragma once
 
 #include <fc/io/raw_fwd.hpp>
+#include <array>
 
 namespace fc {
-    fc::fixed_string<> to_fixed_string(const std::string &a) {
-        fc::fixed_string<> result;
+    template<typename Storage = std::pair<uint64_t, uint64_t>>
+    fc::fixed_string<Storage> to_fixed_string(const std::string &a) {
+        fc::fixed_string<Storage> result;
         if (a.size() < result.max_size()) {
             std::copy(a.begin(), a.end(), result.begin());
         } else {
@@ -67,13 +69,13 @@ namespace fc {
 #include <fc/variant.hpp>
 
 namespace fc {
-    template<typename Storage>
+    template<typename Storage = std::pair<uint64_t, uint64_t>>
     void to_variant(const fixed_string<Storage> &s, variant &v) {
-        v = std::string(s);
+        v = fc::to_string(s);
     }
 
-    template<typename Storage>
+    template<typename Storage = std::pair<uint64_t, uint64_t>>
     void from_variant(const variant &v, fixed_string<Storage> &s) {
-        s = v.as_string();
+        s = fc::to_fixed_string<Storage>(v.as_string());
     }
 }
