@@ -17,20 +17,20 @@ namespace fc {
     }
 
     namespace raw {
-        template<typename Stream, typename Storage>
+        template<typename Stream, typename Storage = std::pair<uint64_t, uint64_t>>
         inline void pack(Stream &s, const fc::fixed_string<Storage> &u) {
             unsigned_int size = u.size();
             pack(s, size);
-            s.write((const char *) &u.data, size);
+            s.write(u.data(), size);
         }
 
-        template<typename Stream, typename Storage>
+        template<typename Stream, typename Storage = std::pair<uint64_t, uint64_t>>
         inline void unpack(Stream &s, fc::fixed_string<Storage> &u) {
             unsigned_int size;
             fc::raw::unpack(s, size);
             if (size.value > 0) {
                 if (size.value > sizeof(Storage)) {
-                    s.read((char *) &u.data, sizeof(Storage));
+                    s.read(u.data(), sizeof(Storage));
                     char buf[1024];
                     size_t left = size.value - sizeof(Storage);
                     while (left >= 1024) {
@@ -47,7 +47,7 @@ namespace fc {
                     */
                     //  s.skip( size.value - sizeof(Storage) );
                 } else {
-                    s.read((char *) &u.data, size.value);
+                    s.read(u.data(), size.value);
                 }
             }
         }
