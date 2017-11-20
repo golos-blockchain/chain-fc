@@ -18,17 +18,6 @@ namespace fc {
         return std::to_string(o);
     }
 
-    template<template<typename T = char, std::size_t TypeSize = 16> class A,
-            typename T = char, std::size_t TypeSize = 16>
-    std::string to_string(const A<T, TypeSize> &a) {
-        return std::string(a.begin(), a.end());
-    }
-
-    template<std::size_t N>
-    std::string to_string(const std::array<char, N> &a) {
-        return std::string(a.begin(), a.end());
-    }
-
     std::string to_string(double);
 
     std::string to_pretty_string(int64_t);
