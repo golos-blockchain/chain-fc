@@ -5,6 +5,7 @@
 #include <fc/io/varint.hpp>
 #include <fc/array.hpp>
 #include <fc/safe.hpp>
+
 #include <deque>
 #include <vector>
 #include <string>
