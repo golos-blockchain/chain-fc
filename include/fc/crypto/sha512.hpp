@@ -26,8 +26,6 @@ namespace fc {
 
         static sha512 hash(const std::string &);
 
-        static sha512 hash(const fc::fixed_string<> &);
-
         template<typename T>
         static sha512 hash(const T &t) {
             sha512::encoder e;

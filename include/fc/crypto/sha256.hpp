@@ -30,8 +30,6 @@ namespace fc {
 
         static sha256 hash(const std::string &);
 
-        static sha256 hash(const fc::fixed_string<> &);
-
         static sha256 hash(const sha256 &);
 
         template<typename T>

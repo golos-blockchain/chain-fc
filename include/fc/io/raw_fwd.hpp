@@ -49,7 +49,7 @@ namespace fc {
       *  The std::string will sort according to the comparison operators defined for Storage, this enables effecient
       *  sorting.
       */
-    template<typename Storage = std::pair<uint64_t, uint64_t>> using fixed_string = std::array<char, sizeof(Storage)>;
+    template<typename Storage> class fixed_string;
 
     namespace raw {
         template<typename T>

@@ -51,10 +51,6 @@ namespace fc {
         return hash(s.c_str(), s.size());
     }
 
-    sha512 sha512::hash(const fc::fixed_string<> &s) {
-        return hash(fc::to_string(s).c_str(), s.size());
-    }
-
     void sha512::encoder::write(const char *d, uint32_t dlen) {
         SHA512_Update(&my->ctx, d, dlen);
     }
