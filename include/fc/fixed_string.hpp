@@ -172,12 +172,12 @@ namespace fc {
     };
 
     namespace raw {
-        template<typename Stream, typename Storage = std::pair<uint64_t, uint64_t>>
+        template<typename Stream, typename Storage>
         inline void pack(Stream &s, const fc::fixed_string<Storage> &u) {
             pack(s, std::string(u));
         }
 
-        template<typename Stream, typename Storage = std::pair<uint64_t, uint64_t>>
+        template<typename Stream, typename Storage>
         inline void unpack(Stream &s, fc::fixed_string<Storage> &u) {
             std::string str;
             unpack(s, str);
