@@ -67,6 +67,18 @@ namespace fc {
         return ss.str();
     }
 
+    std::string to_string(uint64_t d) {
+        return boost::lexical_cast<std::string>(d);
+    }
+
+    std::string to_string(int64_t d) {
+        return boost::lexical_cast<std::string>(d);
+    }
+
+    std::string to_string(uint16_t d) {
+        return boost::lexical_cast<std::string>(d);
+    }
+
     std::string trim(const std::string &s) {
         return boost::algorithm::trim_copy(s);
         /*

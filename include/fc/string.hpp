@@ -13,12 +13,13 @@ namespace fc {
 
     double to_double(const std::string &);
 
-    template<typename T>
-    std::string to_string(const T &o) {
-        return std::to_string(o);
-    }
-
     std::string to_string(double);
+
+    std::string to_string(uint64_t);
+
+    std::string to_string(int64_t);
+
+    std::string to_string(uint16_t);
 
     std::string to_pretty_string(int64_t);
 

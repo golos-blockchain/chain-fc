@@ -1,9 +1,11 @@
 #pragma once
 
+#include <boost/any.hpp>
+
 #include <functional>
 #include <memory>
 #include <string>
-#include <fc/any.hpp>
+
 #include <fc/network/ip.hpp>
 #include <fc/signals.hpp>
 #include <fc/network/http/leaky_bucket.hpp>
@@ -49,11 +51,11 @@ namespace fc {
                 _on_http = h;
             }
 
-            void set_session_data(fc::any d) {
+            void set_session_data(boost::any d) {
                 _session_data = std::move(d);
             }
 
-            fc::any &get_session_data() {
+            boost::any &get_session_data() {
                 return _session_data;
             }
 
@@ -61,7 +63,7 @@ namespace fc {
 
             leaky_bucket_rules rules;
         private:
-            fc::any _session_data;
+            boost::any _session_data;
             std::function<void(const std::string &)> _on_message;
             std::function<std::string(const std::string &)> _on_http;
         };
