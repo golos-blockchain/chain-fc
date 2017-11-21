@@ -259,8 +259,6 @@ namespace fc {
 
     static_assert(sizeof(uint128_t) == 2 * sizeof(uint64_t), "validate packing assumptions");
 
-    typedef uint128_t uint128_t;
-
     class variant;
 
     void to_variant(const uint128_t &var, variant &vo);
