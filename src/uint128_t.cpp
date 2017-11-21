@@ -1,4 +1,4 @@
-#include <fc/uint128.hpp>
+#include <fc/uint128_t.hpp>
 #include <fc/variant.hpp>
 #include <fc/crypto/bigint.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
@@ -44,7 +44,7 @@ namespace fc
       }
     }
 
-    uint128::uint128(const std::string &sz)
+    uint128_t::uint128_t(const std::string &sz)
     :hi(0), lo(0) 
     {
       // do we have at least one character?
@@ -117,18 +117,18 @@ namespace fc
     }
 
 
-    uint128::operator bigint()const
+    uint128_t::operator bigint()const
     {
-       auto tmp  = uint128( bswap_64( hi ), bswap_64( lo ) );
+       auto tmp  = uint128_t( bswap_64( hi ), bswap_64( lo ) );
        bigint bi( (char*)&tmp, sizeof(tmp) );
        return bi;
     }
-    uint128::uint128( const fc::bigint& bi )
+    uint128_t::uint128_t( const fc::bigint& bi )
     {
-       *this = uint128( std::string(bi) ); // TODO: optimize this...
+       *this = uint128_t( std::string(bi) ); // TODO: optimize this...
     }
 
-    uint128::operator std::string ()const
+    uint128_t::operator std::string ()const
     {
       if(*this == 0) { return "0"; }
 
@@ -137,13 +137,13 @@ namespace fc
       static char sz [128 + 1];
        sz[sizeof(sz) - 1] = '\0';
 
-      uint128 ii(*this);
+      uint128_t ii(*this);
       int i = 128 - 1;
 
       while (ii != 0 && i) {
 
-      uint128 remainder;
-      divide(ii, uint128(10), ii, remainder);
+      uint128_t remainder;
+      divide(ii, uint128_t(10), ii, remainder);
           sz [--i] = "0123456789abcdefghijklmnopqrstuvwxyz"[remainder.to_integer()];
       }
 
@@ -151,7 +151,7 @@ namespace fc
     }
 
 
-    uint128& uint128::operator<<=(const uint128& rhs) 
+    uint128_t& uint128_t::operator<<=(const uint128_t& rhs)
     {
         if(rhs >= 128) 
         {
@@ -186,7 +186,7 @@ namespace fc
        return *this;
     }
 
-    uint128 & uint128::operator>>=(const uint128& rhs) 
+    uint128_t & uint128_t::operator>>=(const uint128_t& rhs)
     {
        if(rhs >= 128)
        {
@@ -221,7 +221,7 @@ namespace fc
       return *this;
    }
 
-    uint128& uint128::operator/=(const uint128 &b) 
+    uint128_t& uint128_t::operator/=(const uint128_t &b)
     {
         auto self = (m128(hi) << 64) + m128(lo);
         auto other = (m128(b.hi) << 64) + m128(b.lo);
@@ -230,7 +230,7 @@ namespace fc
         lo = static_cast<uint64_t>((self << 64 ) >> 64);
 
         /*
-        uint128 remainder;
+        uint128_t remainder;
         divide(*this, b, *this, remainder ); //, *this);
         if( tmp.hi != hi || tmp.lo != lo ) {
            std::cerr << tmp.hi << "  " << hi <<"\n";
@@ -247,14 +247,14 @@ namespace fc
         return *this;
     }
 
-    uint128& uint128::operator%=(const uint128 &b) 
+    uint128_t& uint128_t::operator%=(const uint128_t &b)
     {
-        uint128 quotient;
+        uint128_t quotient;
         divide(*this, b, quotient, *this);
         return *this;
     }
 
-    uint128& uint128::operator*=(const uint128 &b) 
+    uint128_t& uint128_t::operator*=(const uint128_t &b)
     {
         uint64_t a0 = (uint32_t) (this->lo        );
         uint64_t a1 = (uint32_t) (this->lo >> 0x20);
@@ -294,7 +294,7 @@ namespace fc
         return *this;
    }
    
-   void uint128::full_product( const uint128& a, const uint128& b, uint128& result_hi, uint128& result_lo )
+   void uint128_t::full_product( const uint128_t& a, const uint128_t& b, uint128_t& result_hi, uint128_t& result_lo )
    {
        //   (ah * 2**64 + al) * (bh * 2**64 + bl)
        // = (ah * bh * 2**128 + al * bh * 2**64 + ah * bl * 2**64 + al * bl
@@ -310,13 +310,13 @@ namespace fc
        uint64_t bh = b.hi;
        uint64_t bl = b.lo;
 
-       uint128 s = al;
+       uint128_t s = al;
        s *= bl;
-       uint128 r = ah;
+       uint128_t r = ah;
        r *= bl;
-       uint128 q = al;
+       uint128_t q = al;
        q *= bh;
-       uint128 p = ah;
+       uint128_t p = ah;
        p *= bh;
        
        uint64_t sl = s.lo;
@@ -342,8 +342,8 @@ namespace fc
        y[2] = acc.lo;
        y[3] = acc.hi + ph;
        
-       result_hi = uint128( y[3], y[2] );
-       result_lo = uint128( y[1], y[0] );
+       result_hi = uint128_t( y[3], y[2] );
+       result_lo = uint128_t( y[1], y[0] );
        
        return;
    }
@@ -369,13 +369,13 @@ namespace fc
       return uint8_t(x);
    }
 
-   uint8_t uint128::popcount()const
+   uint8_t uint128_t::popcount()const
    {
       return _popcount_64( lo ) + _popcount_64( hi );
    }
 
-   void to_variant( const uint128& var,  variant& vo )  { vo = std::string(var);         }
-   void from_variant( const variant& var,  uint128& vo ){ vo = uint128(var.as_string()); }
+   void to_variant( const uint128_t& var,  variant& vo )  { vo = std::string(var);         }
+   void from_variant( const variant& var,  uint128_t& vo ){ vo = uint128_t(var.as_string()); }
 
 } // namespace fc
 

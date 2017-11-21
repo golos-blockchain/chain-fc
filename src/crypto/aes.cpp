@@ -36,7 +36,7 @@ aes_encoder::~aes_encoder()
 {
 }
 
-void aes_encoder::init( const fc::sha256& key, const fc::uint128& init_value )
+void aes_encoder::init( const fc::sha256& key, const fc::uint128_t& init_value )
 {
     my->ctx.obj = EVP_CIPHER_CTX_new();
     /* Create and initialise the context */
@@ -100,7 +100,7 @@ aes_decoder::aes_decoder()
   static int init = init_openssl();
   }
 
-void aes_decoder::init( const fc::sha256& key, const fc::uint128& init_value )
+void aes_decoder::init( const fc::sha256& key, const fc::uint128_t& init_value )
 {
     my->ctx.obj = EVP_CIPHER_CTX_new();
     /* Create and initialise the context */

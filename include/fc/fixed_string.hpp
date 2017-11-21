@@ -1,8 +1,8 @@
 #pragma once
 
-#include <fc/uint128.hpp>
+#include <fc/uint128_t.hpp>
 #include <fc/io/raw_fwd.hpp>
-
+#include <iostream>
 #include <boost/endian/conversion.hpp>
 
 
@@ -54,8 +54,8 @@ namespace fc {
     }
 
     template<>
-    inline uint128 endian_reverse(const uint128 &u) {
-        return uint128(boost::endian::endian_reverse(u.hi), boost::endian::endian_reverse(u.lo));
+    inline uint128_t endian_reverse(const uint128_t &u) {
+        return uint128_t(boost::endian::endian_reverse(u.hi), boost::endian::endian_reverse(u.lo));
     }
 
     template<typename A, typename B>
@@ -71,7 +71,7 @@ namespace fc {
      *  The string will sort according to the comparison operators defined for Storage, this enables effecient
      *  sorting.
      */
-    template<typename Storage = fc::uint128>
+    template<typename Storage = fc::uint128_t>
     class fixed_string {
     public:
         fixed_string() {

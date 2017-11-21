@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fc/uint128.hpp>
+#include <fc/uint128_t.hpp>
 
 #define FC_REAL128_PRECISION (uint64_t(1000000) * uint64_t(1000000) * uint64_t(1000000))
 
@@ -48,12 +48,12 @@ namespace fc {
 
         real128 &operator*=(const real128 &o);
 
-        static real128 from_fixed(const uint128 &fixed);
+        static real128 from_fixed(const uint128_t &fixed);
 
         uint64_t to_uint64() const;
 
     private:
-        uint128 fixed;
+        uint128_t fixed;
     };
 
     void to_variant(const real128 &var, variant &vo);

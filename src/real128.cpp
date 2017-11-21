@@ -10,7 +10,7 @@ namespace fc {
     }
 
     real128::real128(uint64_t integer) {
-        fixed = uint128(integer) * FC_REAL128_PRECISION;
+        fixed = uint128_t(integer) * FC_REAL128_PRECISION;
     }
 
     real128 &real128::operator+=(const real128 &o) {
@@ -25,7 +25,7 @@ namespace fc {
 
     real128 &real128::operator/=(const real128 &o) {
         try {
-            FC_ASSERT(o.fixed > uint128(0), "Divide by Zero");
+            FC_ASSERT(o.fixed > uint128_t(0), "Divide by Zero");
 
             fc::bigint self(fixed);
             fc::bigint other(o.fixed);
@@ -66,7 +66,7 @@ namespace fc {
             // if the std::string doesn't look like "123.45" or ".45", this code isn't designed to parse it correctly
             // in particular, we don't try to handle leading whitespace or '+'/'-' indicators at the beginning
             assert(*c == '.');
-            fixed = fc::uint128();
+            fixed = fc::uint128_t();
         }
 
 
@@ -104,7 +104,7 @@ namespace fc {
         return number;
     }
 
-    real128 real128::from_fixed(const uint128 &fixed) {
+    real128 real128::from_fixed(const uint128_t &fixed) {
         real128 result;
         result.fixed = fixed;
         return result;
