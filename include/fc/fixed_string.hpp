@@ -1,68 +1,9 @@
 #pragma once
 
-#include <fc/uint128_t.hpp>
 #include <fc/io/raw_fwd.hpp>
-#include <iostream>
-#include <boost/endian/conversion.hpp>
 
 
 namespace fc {
-    template<typename A, typename B>
-    struct erpair {
-        erpair() {
-        }
-
-        erpair(const A &a, const B &b) : first(a), second(b) {
-        }
-
-        friend bool operator<(const erpair &a, const erpair &b) {
-            return std::tie(a.first, a.second) < std::tie(b.first, b.second);
-        }
-
-        friend bool operator<=(const erpair &a, const erpair &b) {
-            return std::tie(a.first, a.second) <= std::tie(b.first, b.second);
-        }
-
-        friend bool operator>(const erpair &a, const erpair &b) {
-            return std::tie(a.first, a.second) > std::tie(b.first, b.second);
-        }
-
-        friend bool operator>=(const erpair &a, const erpair &b) {
-            return std::tie(a.first, a.second) >= std::tie(b.first, b.second);
-        }
-
-        friend bool operator==(const erpair &a, const erpair &b) {
-            return std::tie(a.first, a.second) == std::tie(b.first, b.second);
-        }
-
-        friend bool operator!=(const erpair &a, const erpair &b) {
-            return std::tie(a.first, a.second) != std::tie(b.first, b.second);
-        }
-
-        A first{};
-        B second{};
-    };
-
-    template<typename A, typename B>
-    erpair<A, B> make_erpair(const A &a, const B &b) {
-        return erpair<A, B>(a, b);
-    }
-
-    template<typename T>
-    T endian_reverse(const T &x) {
-        return boost::endian::endian_reverse(x);
-    }
-
-    template<>
-    inline uint128_t endian_reverse(const uint128_t &u) {
-        return uint128_t(boost::endian::endian_reverse(u.hi), boost::endian::endian_reverse(u.lo));
-    }
-
-    template<typename A, typename B>
-    erpair<A, B> endian_reverse(const erpair<A, B> &p) {
-        return make_erpair(endian_reverse(p.first), endian_reverse(p.second));
-    }
-
     /**
      *  This class is designed to offer in-place memory allocation of a string up to Length equal to
      *  sizeof(Storage).
@@ -71,50 +12,45 @@ namespace fc {
      *  The string will sort according to the comparison operators defined for Storage, this enables effecient
      *  sorting.
      */
-    template<typename Storage = fc::uint128_t>
+    template<typename Storage = std::pair<uint64_t, uint64_t> >
     class fixed_string {
     public:
         fixed_string() {
+            memset((char *) &data, 0, sizeof(data));
         }
 
         fixed_string(const fixed_string &c) : data(c.data) {
         }
 
-        fixed_string(const char *str) : fixed_string(std::string(str)) {
+        fixed_string(const std::string &str) {
+            memset((char *) &data, 0, sizeof(data));
+            if (str.size() < sizeof(data)) {
+                memcpy((char *) &data, str.c_str(), str.size());
+            } else {
+                memcpy((char *) &data, str.c_str(), sizeof(data));
+            }
         }
 
-        fixed_string(const std::string &str) {
-            Storage d;
-            if (str.size() <= sizeof(d)) {
-                memcpy((char *) &d, str.c_str(), str.size());
+        fixed_string(const char *str) {
+            memset((char *) &data, 0, sizeof(data));
+            auto l = strlen(str);
+            if (l < sizeof(data)) {
+                memcpy((char *) &data, str, l);
             } else {
-                memcpy((char *) &d, str.c_str(), sizeof(d));
+                memcpy((char *) &data, str, sizeof(data));
             }
-
-            data = boost::endian::big_to_native(d);
         }
 
         operator std::string() const {
-            Storage d = boost::endian::native_to_big(data);
-            size_t s;
-
-            if (*(((const char *) &d) + sizeof(d) - 1)) {
-                s = sizeof(d);
-            } else {
-                s = strnlen((const char *) &d, sizeof(d));
-            }
-
-            const char *self = (const char *) &d;
-
-            return std::string(self, self + s);
+            const char *self = (const char *) &data;
+            return std::string(self, self + size());
         }
 
         uint32_t size() const {
-            Storage d = boost::endian::native_to_big(data);
-            if (*(((const char *) &d) + sizeof(d) - 1)) {
-                return sizeof(d);
+            if (*(((const char *) &data) + sizeof(data) - 1)) {
+                return sizeof(data);
             }
-            return strnlen((const char *) &d, sizeof(d));
+            return strnlen((const char *) &data, sizeof(data));
         }
 
         uint32_t length() const {
@@ -127,12 +63,16 @@ namespace fc {
         }
 
         fixed_string &operator=(const char *str) {
-            *this = fixed_string(str);
-            return *this;
+            return *this = fixed_string(str);
         }
 
         fixed_string &operator=(const std::string &str) {
-            *this = fixed_string(str);
+            memset((char *) &data, 0, sizeof(data));
+            if (str.size() < sizeof(data)) {
+                memcpy((char *) &data, str.c_str(), str.size());
+            } else {
+                memcpy((char *) &data, str.c_str(), sizeof(data));
+            }
             return *this;
         }
 
@@ -168,21 +108,61 @@ namespace fc {
             return a.data != b.data;
         }
 
+        friend std::ostream &operator<<(std::ostream &out, const fixed_string &str) {
+            return out << std::string(str);
+        }
+
+        //private:
         Storage data;
     };
 
     namespace raw {
         template<typename Stream, typename Storage>
         inline void pack(Stream &s, const fc::fixed_string<Storage> &u) {
-            pack(s, std::string(u));
+            unsigned_int size = u.size();
+            pack(s, size);
+            s.write((const char *) &u.data, size);
         }
 
         template<typename Stream, typename Storage>
         inline void unpack(Stream &s, fc::fixed_string<Storage> &u) {
-            std::string str;
-            unpack(s, str);
-            u = str;
+            unsigned_int size;
+            fc::raw::unpack(s, size);
+            if (size.value > 0) {
+                if (size.value > sizeof(Storage)) {
+                    s.read((char *) &u.data, sizeof(Storage));
+                    char buf[1024];
+                    size_t left = size.value - sizeof(Storage);
+                    while (left >= 1024) {
+                        s.read(buf, 1024);
+                        left -= 1024;
+                    }
+                    s.read(buf, left);
+
+                    /*
+                    s.seekp( s.tellp() + (size.value - sizeof(Storage)) );
+                    char tmp;
+                    size.value -= sizeof(storage);
+                    while( size.value ){ s.read( &tmp, 1 ); --size.value; }
+                    */
+                    //  s.skip( size.value - sizeof(Storage) );
+                } else {
+                    s.read((char *) &u.data, size.value);
+                }
+            }
         }
+
+        /*
+        template<typename Stream, typename... Args>
+        inline void pack( Stream& s, const boost::multiprecision::number<Args...>& d ) {
+           s.write( (const char*)&d, sizeof(d) );
+        }
+
+        template<typename Stream, typename... Args>
+        inline void unpack( Stream& s, boost::multiprecision::number<Args...>& u ) {
+           s.read( (const char*)&u, sizeof(u) );
+        }
+        */
     }
 }
 
@@ -190,12 +170,12 @@ namespace fc {
 
 namespace fc {
     template<typename Storage>
-    void to_variant(const fc::fixed_string<Storage> &s, variant &v) {
+    void to_variant(const fixed_string<Storage> &s, variant &v) {
         v = std::string(s);
     }
 
     template<typename Storage>
-    void from_variant(const variant &v, fc::fixed_string<Storage> &s) {
+    void from_variant(const variant &v, fixed_string<Storage> &s) {
         s = v.as_string();
     }
 }
