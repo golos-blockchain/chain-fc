@@ -294,7 +294,7 @@ namespace fc {
     };
 
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wall"
+#pragma GCC diagnostic ignored "-Wmultichar"
 
     typedef basic_exception<timeout_exception_code, boost::mpl::string<'Timeout'>> timeout_exception;
 
