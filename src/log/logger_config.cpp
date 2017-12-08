@@ -76,13 +76,9 @@ namespace fc {
         c.push_back(mutable_variant_object("level", "error")("color", "red"));
 
         cfg.appenders.push_back(appender_config("stderr", "console",
-                                                mutable_variant_object()("stream", "std_error")("level_colors", c)));
+                mutable_variant_object()("stream", "std_error")("level_colors", c)));
         cfg.appenders.push_back(
                 appender_config("stdout", "console", mutable_variant_object()("stream", "std_out")("level_colors", c)));
-        cfg.appenders.push_back(appender_config("stderr", "json_console",
-                                                mutable_variant_object()("stream", "std_error")("level_colors", c)));
-        cfg.appenders.push_back(appender_config("stdout", "json_console",
-                                                mutable_variant_object()("stream", "std_out")("level_colors", c)));
 
         logger_config dlc;
         dlc.name = "default";
