@@ -24,6 +24,8 @@ namespace fc {
 
             virtual variant send_call(api_id_type api_id, std::string method_name, variants args = variants());
 
+            virtual variant send_call( std::string api_name, std::string method_name, variants args = variants() );
+
             virtual variant send_callback(uint64_t callback_id, variants args = variants());
 
             virtual void send_notice(uint64_t callback_id, variants args = variants());

@@ -53,6 +53,10 @@ namespace fc {
             FC_ASSERT(false);
         }
 
+        variant cli::send_call( std::string api_name, std::string method_name, variants args /* = variants() */ ) {
+         FC_ASSERT(false);
+        }
+
         void cli::send_notice(uint64_t callback_id, variants args /* = variants() */ ) {
             FC_ASSERT(false);
         }
