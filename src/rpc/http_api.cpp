@@ -101,7 +101,11 @@ void http_api_connection::on_request( const fc::http::request& req, const fc::ht
       auto var = fc::json::from_string( req_body );
       const auto& var_obj = var.get_object();
 
-      if( var_obj.contains( "method" ) ) {
+      // TODO: separate the "no method" and "no id" cases.
+      // No "id" means it's notification, which should not be answered:
+      // http://www.jsonrpc.org/specification#notification
+      bool valid = var_obj.contains("method") && var_obj.contains("id");
+      if (valid) {
          auto call = var.as<fc::rpc::request>();
          try {
             try {
@@ -115,6 +119,7 @@ void http_api_connection::on_request( const fc::http::request& req, const fc::ht
             resp_status = http::reply::InternalServerError;
          }
       } else {
+         // TODO: jsonrpc 2.0 spec requires to return Error object on error
          resp_status = http::reply::BadRequest;
          resp_body = "";
       }
