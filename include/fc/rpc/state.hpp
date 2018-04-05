@@ -6,7 +6,7 @@
 namespace fc { namespace rpc {
         struct request {
             std::string         jsonrpc = "2.0";
-            optional<uint64_t>  id;
+            optional<uint64_t>  id;         // NOTE: spec allows string id too
             std::string         method;
             variants            params;
         };
