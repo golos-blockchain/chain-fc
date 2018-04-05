@@ -34,7 +34,7 @@ namespace fc {
 #endif
             { 
               static boost::atomic<int> cnt(0);
-              name = std::string("th_") + char('a'+cnt++);
+              name = std::string("th_") + std::to_string(cnt++);
 //              printf("thread=%p\n",this);
             }
 
