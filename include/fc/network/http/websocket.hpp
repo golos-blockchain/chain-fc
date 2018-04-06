@@ -122,12 +122,10 @@ namespace fc {
         class websocket_client {
         public:
             websocket_client(const std::string &ca_filename = "_default");
-
             ~websocket_client();
 
-            websocket_connection_ptr connect(const std::string &uri);
-
-            websocket_connection_ptr secure_connect(const std::string &uri);
+            websocket_connection_ptr connect(const std::string& uri, bool reconnect = false);
+            websocket_connection_ptr secure_connect(const std::string& uri, bool reconnect = false);
 
         private:
             std::unique_ptr<detail::websocket_client_impl> my;
