@@ -493,7 +493,7 @@ namespace fc {
                                         if (!_shutting_down) {
                                             _connection->closed();
                                         }
-                                        if (!_reset_on_close) {
+                                        if (_reset_on_close) {
                                             _connection.reset();
                                         }
                                     }
