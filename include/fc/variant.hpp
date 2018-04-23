@@ -195,7 +195,8 @@ namespace fc {
 
 #ifdef __APPLE__
 
-    void to_variant(size_t s, variant &v);
+    void to_variant(size_t s, variant& v);
+    void from_variant(variant& v, size_t& s);
 
 #elif !defined(_MSC_VER)
     void to_variant( long long int s, variant& v );
@@ -665,8 +666,11 @@ namespace fc {
 
 #ifdef __APPLE__
 
-    inline void to_variant(size_t s, variant &v) {
+    inline void to_variant(size_t s, variant& v) {
         v = variant(uint64_t(s));
+    }
+    inline void from_variant(const variant& v, size_t& s) {
+        s = v.as_uint64();
     }
 
 #endif
