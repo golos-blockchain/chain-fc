@@ -66,7 +66,7 @@ namespace fc {
         return false;
     }
 
-    logging_config logging_config::default_config() {
+    logging_config logging_config::default_config(log_level level) {
         //slog( "default cfg" );
         logging_config cfg;
 
@@ -75,14 +75,14 @@ namespace fc {
         c.push_back(mutable_variant_object("level", "warn")("color", "brown"));
         c.push_back(mutable_variant_object("level", "error")("color", "red"));
 
-        cfg.appenders.push_back(appender_config("stderr", "console",
-                mutable_variant_object()("stream", "std_error")("level_colors", c)));
         cfg.appenders.push_back(
-                appender_config("stdout", "console", mutable_variant_object()("stream", "std_out")("level_colors", c)));
+            appender_config("stderr", "console", mutable_variant_object()("stream", "std_error")("level_colors", c)));
+        cfg.appenders.push_back(
+            appender_config("stdout", "console", mutable_variant_object()("stream", "std_out")("level_colors", c)));
 
         logger_config dlc;
         dlc.name = "default";
-        dlc.level = log_level::debug;
+        dlc.level = level;
         dlc.appenders.push_back("stderr");
         cfg.loggers.push_back(dlc);
         return cfg;

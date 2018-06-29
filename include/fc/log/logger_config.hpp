@@ -6,8 +6,8 @@ namespace fc {
     class path;
 
     struct appender_config {
-        appender_config(const std::string &name = "", const std::string &type = "", variant args = variant()) : name(
-                name), type(type), args(fc::move(args)), enabled(true) {
+        appender_config(const std::string &name = "", const std::string &type = "", variant args = variant())
+            : name(name), type(type), args(fc::move(args)), enabled(true) {
         }
 
         std::string name;
@@ -33,7 +33,7 @@ namespace fc {
     };
 
     struct logging_config {
-        static logging_config default_config();
+        static logging_config default_config(log_level level = log_level::debug);
 
         std::vector<std::string> includes;
         std::vector<appender_config> appenders;
