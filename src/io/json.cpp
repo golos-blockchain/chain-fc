@@ -882,22 +882,27 @@ namespace fc {
             return false;
         }
         fc::stringstream in(utf8_str);
-        switch (ptype) {
-            case legacy_parser:
-                variant_from_stream<fc::stringstream, legacy_parser>(in);
-                break;
-            case legacy_parser_with_string_doubles:
-                variant_from_stream<fc::stringstream, legacy_parser_with_string_doubles>(in);
-                break;
-            case strict_parser:
-                json_relaxed::variant_from_stream<fc::stringstream, true>(in);
-                break;
-            case relaxed_parser:
-                json_relaxed::variant_from_stream<fc::stringstream, false>(in);
-                break;
-            default:
-                FC_ASSERT(false, "Unknown JSON parser type {ptype}", ("ptype", ptype));
+        try {
+            switch (ptype) {
+                case legacy_parser:
+                    variant_from_stream<fc::stringstream, legacy_parser>(in);
+                    break;
+                case legacy_parser_with_string_doubles:
+                    variant_from_stream<fc::stringstream, legacy_parser_with_string_doubles>(in);
+                    break;
+                case strict_parser:
+                    json_relaxed::variant_from_stream<fc::stringstream, true>(in);
+                    break;
+                case relaxed_parser:
+                    json_relaxed::variant_from_stream<fc::stringstream, false>(in);
+                    break;
+                default:
+                    FC_ASSERT(false, "Unknown JSON parser type {ptype}", ("ptype", ptype));
+            }
+        } catch (const parse_error_exception &e) {
+            return false;
         }
+
         try {
             in.peek();
         } catch (const eof_exception &e) {
