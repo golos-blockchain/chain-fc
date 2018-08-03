@@ -351,7 +351,7 @@ namespace fc {
             return impl::storage_ops<0, Types...>::apply(_tag, storage, v);
         }
 
-        static int count() {
+        static constexpr int count() {
             return impl::type_info<Types...>::count;
         }
 
