@@ -272,7 +272,7 @@ namespace fc {
         }
 
         template<typename Stream>
-        inline void unpack(Stream &s, uint128_t &u) {
+        inline void unpack(Stream &s, uint128_t &u, uint32_t) {
             s.read((char *) &u, sizeof(u));
         }
     }
