@@ -184,9 +184,10 @@ namespace fc {
         }
 
         template<typename Stream, typename Storage>
-        inline void unpack(Stream &s, fixed_string<Storage> &u) {
+        inline void unpack(Stream &s, fixed_string<Storage> &u, uint32_t depth) {
+            depth++;
             std::string str;
-            unpack(s, str);
+            unpack(s, str, depth);
             u = str;
         }
 

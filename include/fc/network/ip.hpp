@@ -105,9 +105,9 @@ namespace fc {
         }
 
         template<typename Stream>
-        inline void unpack(Stream &s, ip::address &v) {
+        inline void unpack(Stream &s, ip::address &v, uint32_t depth) {
             uint32_t _ip;
-            fc::raw::unpack(s, _ip);
+            fc::raw::unpack(s, _ip, depth);
             v = ip::address(_ip);
         }
 
@@ -118,11 +118,12 @@ namespace fc {
         }
 
         template<typename Stream>
-        inline void unpack(Stream &s, ip::endpoint &v) {
+        inline void unpack(Stream &s, ip::endpoint &v, uint32_t depth) {
+            depth++;
             ip::address a;
             uint16_t p;
-            fc::raw::unpack(s, a);
-            fc::raw::unpack(s, p);
+            fc::raw::unpack(s, a, depth);
+            fc::raw::unpack(s, p, depth);
             v = ip::endpoint(a, p);
         }
 
