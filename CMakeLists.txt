@@ -156,6 +156,7 @@ option(UNITY_BUILD OFF)
 
 set(fc_sources
     src/uint128_t.cpp
+    src/uint128lh_t.cpp
     src/real128.cpp
     src/variant.cpp
     src/exception.cpp
