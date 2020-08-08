@@ -7,6 +7,7 @@
 #include <boost/interprocess/containers/map.hpp>
 #include <boost/interprocess/containers/flat_map.hpp>
 #include <boost/interprocess/containers/set.hpp>
+#include <boost/interprocess/containers/flat_set.hpp>
 #include <boost/interprocess/containers/deque.hpp>
 #include <fc/crypto/hex.hpp>
 #include <fc/io/raw_fwd.hpp>
@@ -77,6 +78,16 @@ namespace fc {
 
     template<typename... T>
     void to_variant(const bip::set<T...> &t, fc::variant &v) {
+        std::vector<variant> vars;
+        vars.reserve(t.size());
+        for (const auto &item : t) {
+            vars.emplace_back(item);
+        }
+        v = std::move(vars);
+    }
+
+    template<typename... T>
+    void to_variant(const bip::flat_set<T...> &t, fc::variant &v) {
         std::vector<variant> vars;
         vars.reserve(t.size());
         for (const auto &item : t) {
