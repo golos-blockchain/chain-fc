@@ -67,6 +67,10 @@ namespace fc {
             return _count;
         }
 
+        int64_t to_milliseconds() const {
+            return _count / 1000;
+        }
+
         int64_t to_seconds() const {
             return _count / 1000000;
         }
