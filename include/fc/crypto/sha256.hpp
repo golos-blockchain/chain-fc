@@ -136,14 +136,14 @@ namespace std {
     };
 }
 
-namespace boost {
-    template<>
-    struct hash<fc::sha256> {
-        size_t operator()(const fc::sha256 &s) const {
-            return s._hash[3];//*((size_t*)&s);
-        }
-    };
-}
+// namespace boost {
+//     template<>
+//     struct hash<fc::sha256> {
+//         size_t operator()(const fc::sha256 &s) const {
+//             return s._hash[3];//*((size_t*)&s);
+//         }
+//     };
+// }
 
 #include <fc/reflect/reflect.hpp>
 
