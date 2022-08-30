@@ -59,10 +59,20 @@ namespace fc {
         void stacktrace_sigabrt_handler(int signum) {
             stacktrace_signal_handler(signum, "SIGABRT");
         }
+
+        void stacktrace_sigfpe_handler(int signum) {
+            stacktrace_signal_handler(signum, "SIGFPE");
+        }
+
+        void stacktrace_sigill_handler(int signum) {
+            stacktrace_signal_handler(signum, "SIGILL");
+        }
     }
 
     void install_stacktrace_crash_handler() {
         ::signal(SIGSEGV, &stacktrace_sigsegv_handler);
         ::signal(SIGABRT, &stacktrace_sigabrt_handler);
+        ::signal(SIGFPE, &stacktrace_sigfpe_handler);
+        ::signal(SIGILL, &stacktrace_sigill_handler);
     }
 }
