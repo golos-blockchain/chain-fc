@@ -395,6 +395,7 @@ namespace fc
       throw e; \
    }
 
+// args are required, or use FC_LOG_AND_RETHROW
 #define FC_CAPTURE_LOG_AND_RETHROW( ... )  \
    catch( fc::exception& er ) { \
       wlog( "${details}", ("details",er.to_detail_string()) ); \
@@ -418,6 +419,7 @@ namespace fc
       throw e; \
    }
 
+// args are required
 #define FC_CAPTURE_AND_LOG( ... )  \
    catch( fc::exception& er ) { \
       wlog( "${details}", ("details",er.to_detail_string()) ); \
@@ -459,6 +461,7 @@ namespace fc
                 std::current_exception() ); \
    }
 
+// args are optional
 #define FC_CAPTURE_AND_RETHROW( ... ) \
    catch( fc::exception& er ) { \
       FC_RETHROW_EXCEPTION( er, warn, "", FC_FORMAT_ARG_PARAMS(__VA_ARGS__) ); \
