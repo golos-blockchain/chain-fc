@@ -35,7 +35,6 @@ set(ORIGINAL_LIB_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
 set(BOOST_COMPONENTS)
 list(APPEND BOOST_COMPONENTS thread date_time system filesystem program_options serialization chrono unit_test_framework context locale iostreams)
-set(Boost_USE_STATIC_LIBS ON CACHE STRING "ON or OFF")
 
 if(ECC_IMPL STREQUAL openssl)
     set(ECC_REST src/crypto/elliptic_impl_pub.cpp)
@@ -387,6 +386,10 @@ if(NOT Boost_UNIT_TEST_FRAMEWORK_LIBRARY MATCHES "\\.(a|lib)$")
     else(MSVC)
         add_definitions(-DBOOST_TEST_DYN_LINK)
     endif(MSVC)
+endif()
+
+if(NOT Boost_USE_STATIC_LIBS)
+    add_definitions(-DBOOST_TEST_DYN_LINK)
 endif()
 
 include_directories(vendor/websocketpp)
